@@ -139,3 +139,7 @@ $(document).ready(function() {
         });
     })
 });
+
+function escapeHtml(text) {
+    return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}

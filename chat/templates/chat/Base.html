@@ -209,7 +209,7 @@
             event.preventDefault();
             var username = $("#finduser").val();
 
-            window.location.href = "/addfriend/" + username;
+            window.location.href = "/addfriend/" + escapeHtml(username);
         });
     </script>
 
@@ -430,7 +430,7 @@
                 width +
                 '%;">' +
                 "<h5>" +
-                messageInput +
+                escapeHtml(messageInput) +
                 "</h5>" +
                 "</div>";
             $("#board").append(text_box);
