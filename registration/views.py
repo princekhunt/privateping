@@ -164,7 +164,7 @@ def AnonymousDirectLogin(request):
             password = ''.join(random.choices("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", k=8))
             email = username + "@noemailrequired.com"
 
-            User.objects.create_user(username=username, email=email, password=password)
+            user = User.objects.create_user(username=username, email=email, password=password)
             user_type.objects.create(user=user, type="Anonymous")
             UserProfile.objects.create(email=email, name=username, username=username)
 
