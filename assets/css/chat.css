@@ -1,0 +1,112 @@
+.container {
+  border: 2px solid #dedede;
+  background-color: #e5e5ea;
+  border-radius: 0px 15px 15px 15px;
+  padding: 10px;
+  margin: 10px;
+  overflow: hidden;
+
+  /* make the box at left side */
+  float: left;
+  clear: both;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.container-darker {
+  /*max-height: 120px;*/
+  /* make color bluish */
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  border-radius: 15px 15px 0px 15px;
+  color: #fff;
+
+  background-color: #1289fe;
+  padding: 10px;
+  margin: 10px;
+  overflow: hidden;
+
+  /* make the box at right side */
+  float: right;
+  clear: both;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.container::after {
+  content: "";
+  clear: both;
+  display: table;
+  -webkit-box-shadow: 5px 5px 2px #dedede;
+  -moz-box-shadow: 5px 5px 2px #dedede;
+  box-shadow: 5px 5px 2px #dedede;
+}
+
+.container img {
+  float: left;
+  max-width: 60px;
+  margin-right: 20px;
+  border-radius: 50%;
+}
+
+.container img.right {
+  float: right;
+  margin-left: 20px;
+  margin-right: 0;
+}
+
+.time-right {
+  float: right;
+  color: #aaa;
+}
+
+.time-left {
+  float: left;
+  color: #999;
+}
+
+.messages {
+  height: 500px;
+  /*width: 1200px;*/
+  border: thick solid #000;
+  border-width: 2px;
+  margin-top: 16px;
+  overflow-y: auto;
+}
+
+#msg_field {
+  margin-left: 24px;
+  margin-top: 16px;
+  width: 1030px;
+}
+
+#send_btn {
+  margin-top: 16px;
+  height: 40px;
+}
+
+.container-darker::after {
+  content: "";
+  clear: both;
+  display: table;
+  -webkit-box-shadow: 5px 5px 2px #dedede;
+  -moz-box-shadow: 5px 5px 2px #dedede;
+  box-shadow: 5px 5px 2px #dedede;
+}
+
+.container-darker img {
+  float: left;
+  max-width: 60px;
+  margin-right: 20px;
+  border-radius: 50%;
+}
+
+.container-darker img.right {
+  float: right;
+  margin-left: 20px;
+  margin-right: 0;
+}

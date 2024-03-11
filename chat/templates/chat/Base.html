@@ -1,0 +1,520 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static 'css/base_style.css' %}" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Nunito&family=Open+Sans:ital,wght@0,300;0,400;1,300&family=Solitreo&display=swap"
+        rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link rel="stylesheet" href="{% static 'css/chat/Base.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}" />
+    <script type="text/javascript" src="{% static 'js/chat/Base.js' %}"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+    <!--define favicon for all devices-->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicons/apple-touch-icon.png' %}" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicons/favicon-32x32.png' %}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicons/favicon-16x16.png' %}" />
+
+    <!--define favicon for android chrome-->
+    <link rel="icon" type="image/png" sizes="192x192"
+        href="{% static 'images/favicons/android-chrome-192x192.png' %}" />
+    <link rel="icon" type="image/png" sizes="512x512"
+        href="{% static 'images/favicons/android-chrome-512x512.png' %}" />
+
+    <!--define favicon general-->
+    <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
+
+    {% block head %}{% endblock %}
+
+    <title>PrivatePing - A secure Messaging Application</title>
+</head>
+
+<body>
+    {% if anonymous %}
+    <button id="anonymous_info_button" type="button" class="btn btn-primary" data-toggle="modal"
+        data-target="#anonymous_info" hidden="true"></button>
+
+    <div class="modal fade" id="anonymous_info" tabindex="-1" role="dialog" aria-labelledby="anonymous_info"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">
+                        Welcome to PrivatePing
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    Please share your username: <br /><b><u>{{request.user}}</u></b><br />with the person you wish to
+                    chat with.
+                    <br><br><br>
+                    <small>Note: This temporary account will be logged out automatically in 24 hours, and deleted.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <!-- Modal -->
+    <div class="modal fade" id="AddFriend" tabindex="-1" role="dialog" aria-labelledby="Add Friend" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="Add friend">Connect to a User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <form id="adduserform">
+                            {% csrf_token %}
+                            <small>Please enter exact username (Case-sensitive)</small>
+                            <br />
+                            <input class="add-user-input" type="text" placeholder="Enter username" name="friend" id="finduser"
+                                 autocomplete="off" /><br /><br />
+                            <button type="submit" id="adduserbutton" class="btn btn-outline-primary">
+                                <i class="fa fa-plus"></i> Add
+                            </button>
+                        </form>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidenav">
+        <div class="row">
+            <a href="/">
+                <div class="col">
+                    <h3 class="top-nav-header">
+                        <i class="fa fa-lock" aria-hidden="true"></i> PrivatePing
+                    </h3>
+                </div>
+            </a>
+            <li style="border: none; 
+            background-color: transparent;"
+                class="top-nav-list ist-group-item list-group-item-action custom">
+                <div style="position: relative; width: 100%; margin-left: 15vh">
+                    <a style="width: fit-content; color: rgb(25, 91, 246); cursor: pointer" data-toggle="modal"
+                        data-target="#AddFriend"><i class="fa fa-user-plus circle-icon" aria-hidden="true"></i></a>
+                </div>
+            </li>
+        </div>
+
+        <hr class="mt-0 mb-4" />
+        <div class="friends" style="overflow-y: auto">
+            <ul class="list-group">
+                {% for friend in friends %}
+                <a href="http://{{ request.get_host }}/waiting-room?user={{friend.username}}">
+                    <li class="list-group-item list-group-item-action">
+                        <div class="row">
+                            <div class="col">
+                                <img style="border-radius: 50%"
+                                    src="https://ui-avatars.com/api/?background=random&color=fff&name={{friend.name}}"
+                                    style="width: 50px; height: 50px" />
+                            </div>
+                            <div class="col">
+                                <div class="row">
+                                    <p>{{friend.name}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </a>
+                {% endfor %}
+            </ul>
+        </div>
+        <div style="
+          display: flex;
+          position: fixed;
+          bottom: 0;
+          width: 10%;
+          text-align: left;
+          margin-left: 15vh;
+          margin-bottom: 10vh;
+        ">
+            {% if anonymous %}
+            <a style="color: rgb(25, 91, 246); cursor: pointer" onclick="logout();"><i class="fa fa-sign-in circle-icon"
+                    aria-hidden="true"></i></a>
+            {% else %}
+            <a style="color: rgb(25, 91, 246)" href="/logout"><i class="fa fa-sign-out circle-icon"
+                    aria-hidden="true"></i></a>
+
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="main">
+        {% block content %}
+        <div class="greet">
+            <h4>🙋‍♂️ नमस्ते {{request.user}}</h4>
+        </div>
+        <div class="greet-tagline">
+            <h2>Privacy is a <u>Fundamental</u> Right!</h2>
+            <small><i class="fa fa-lock"></i> Your messages are protected with
+                End-to-End Encryption and never stored on our servers.</small>
+        </div>
+        <div class="footer built-credit">
+            <small>Built with ❤️ in India</small>
+        </div>
+        {% endblock %}
+    </div>
+    {% if anonymous %}
+    <script>
+        //check cookie
+        var Anotified = getCookie("Anotified");
+        if (Anotified == null || Anotified == "") {
+            //show the notification
+            setTimeout(function () {
+                document.getElementById("anonymous_info_button").click();
+            }, 1000);
+            //set the cookie named Anotified
+            document.cookie = "Anotified=true";
+        } else {
+        }
+
+        function logout() {
+            confimation = confirm(
+                "Your temporary account will be deleted on logging out, are you sure?"
+            );
+            if (confimation) {
+                window.location.href = "/logout";
+            }
+        }
+    </script>
+    {% endif %}
+
+    <script>
+        $("#adduserbutton").on("click", function (event) {
+            event.preventDefault();
+            var username = $("#finduser").val();
+
+            window.location.href = "/addfriend/" + username;
+        });
+    </script>
+
+    <script>
+        //WebSockets Script start
+        flowOpen = false;
+
+        const socketProtocol =
+            window.location.protocol === "https:" ? "wss" : "ws";
+
+        const socket = new WebSocket(
+            socketProtocol + "://" + window.location.host + "/ws/chat"
+        );
+
+        // Connection opened
+        socket.addEventListener("open", (event) => {
+            send_status = {
+                status: "online",
+                for: getUserName(),
+            };
+            send_status = JSON.stringify(send_status);
+            socket.send(send_status);
+        });
+
+        // Listen for messages
+        var loaderstatus = 0;
+        socket.addEventListener("message", (event) => {
+            
+            if(window.location.href.includes("/chat")){
+                if(flowOpen == false){
+                    flowOpen = true;
+                    alert("You can now send messages.");
+                    document.getElementById("msg_field").disabled = false;
+                    document.getElementById("send_btn").disabled = false;
+                    document.getElementById("live-notification-text").innerHTML = "Online";
+                    document.getElementById("live-notification-dot").style.color = "green";
+            }
+            }
+
+
+
+            //get only message from event.data
+            const obj = JSON.parse(event.data);
+            //check if already there is a loader, then don't append
+            if (obj.status == "typing") {
+                if (loaderstatus == 0) {
+                    if (document.getElementById("fromloader") == null) {
+                        var loader =
+                            '<div id="fromloader" class="container" style="max-width: 30%;"><h5><span class="messageloader"></span></h5></div>';
+                        $("#board").append(loader);
+                        scrolltoend();
+                        loaderstatus = 1;
+                    }
+                }
+            }
+            if (obj.status == "online") {
+                //somehow, calling one time is removing the loader.
+
+                document.getElementById("fromloader").remove();
+
+                loaderstatus = 0;
+            }
+            var message = obj.message;
+
+            //base64 to array buffer
+            function base64ToArrayBuffer(base64) {
+                const binary_string = window.atob(base64);
+                const len = binary_string.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binary_string.charCodeAt(i);
+                }
+                return bytes.buffer;
+            }
+            //convert to array buffer
+            const arrayBuffer = base64ToArrayBuffer(message);
+
+            //get the private key from local storage
+            const privateKey = JSON.parse(localStorage.getItem("privateKey"));
+            //convert the private key to a CryptoKey object
+            decryptData(arrayBuffer, privateKey).then((decrypted_message) => {
+                //convert to string
+                const decoder = new TextDecoder();
+                const decrypted = decoder.decode(decrypted_message);
+                message = decrypted;
+
+                var dt = new Date();
+                //show time
+                var time = dt.getHours() + ":" + dt.getMinutes();
+                const outputDiv = document.getElementById("output");
+                var lenth = message.length;
+                var width = 0;
+                if (lenth < 10) {
+                    width = 20;
+                } else if (lenth > 10 && lenth < 20) {
+                    width = 30;
+                } else if (lenth > 20 && lenth < 30) {
+                    width = 40;
+                } else if (lenth > 30 && lenth < 40) {
+                    width = 40;
+                } else if (lenth > 40 && lenth < 50) {
+                    width = 50;
+                } else if (lenth > 50 && lenth < 60) {
+                    width = 60;
+                } else if (lenth > 60 && lenth < 70) {
+                    width = 70;
+                } else if (lenth > 70 && lenth < 80) {
+                    width = 80;
+                } else if (lenth > 80 && lenth < 90) {
+                    width = 90;
+                } else if (lenth > 90 && lenth < 100) {
+                    width = 100;
+                } else {
+                    width = 100;
+                }
+                const text_box =
+                    '<div class="container" style="max-width: ' +
+                    width +
+                    '%;">' +
+                    "<h5>" +
+                    message +
+                    "</h5>" +
+                    "</div>";
+                $("#board").append(text_box);
+                scrolltoend();
+                $("#fromloader").remove();
+
+                new Audio("{% static 'media/received.mp3' %}").play();
+            });
+        });
+        // Connection closed
+        socket.addEventListener("close", (event) => {
+
+        });
+
+        // Connection error
+        socket.addEventListener("error", (event) => {
+        });
+
+        // Function to send a message
+        $("#chat-box").on("submit", function (event) {
+            event.preventDefault();
+
+            //append loader in button
+            //remove icon first
+            $("#send_btn").html('<span class="MessageSendLoader"></span>');
+
+            if ($("#msg_field").val() == "") {
+                return;
+            }
+            var messageInput = $("#msg_field").val();
+
+            //get the public key from cookie
+            var public_key = getCookie("public_key");
+
+            //base64 utf-8 decode
+            public_key = decodeURIComponent(escape(window.atob(public_key)));
+
+            //encrypt the message
+            var message = new TextEncoder().encode(messageInput);
+            //use function encrypt
+            //Array buffer
+
+            function arrayBufferToBase64(buffer) {
+                let binary = "";
+                const bytes = new Uint8Array(buffer);
+                for (let i = 0; i < bytes.byteLength; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return btoa(binary);
+            }
+
+            encryptData(message, public_key).then((encrypted_message) => {
+                //convert to base64
+                const base64 = arrayBufferToBase64(encrypted_message);
+                socket.send(
+                    JSON.stringify({
+                        message: base64,
+                        to: getUserName(),
+                    })
+                );
+            });
+
+            // Clear the input field
+            $("#msg_field").val("");
+
+            var dt = new Date();
+            var time = dt.getHours() + ":" + dt.getMinutes();
+            // decide the max width of the container based on the length of the message
+            var lenth = messageInput.length;
+            var width = 0;
+            if (lenth < 10) {
+                width = 30;
+            } else if (lenth > 10 && lenth < 20) {
+                width = 30;
+            } else if (lenth > 20 && lenth < 30) {
+                width = 30;
+            } else if (lenth > 30 && lenth < 40) {
+                width = 40;
+            } else if (lenth > 40 && lenth < 50) {
+                width = 50;
+            } else if (lenth > 50 && lenth < 60) {
+                width = 60;
+            } else if (lenth > 60 && lenth < 70) {
+                width = 70;
+            } else if (lenth > 70 && lenth < 80) {
+                width = 80;
+            } else if (lenth > 80 && lenth < 90) {
+                width = 90;
+            } else if (lenth > 90 && lenth < 100) {
+                width = 100;
+            } else {
+                width = 100;
+            }
+
+            const text_box =
+                '<div class="container-darker" style="max-width: ' +
+                width +
+                '%;">' +
+                "<h5>" +
+                messageInput +
+                "</h5>" +
+                "</div>";
+            $("#board").append(text_box);
+            scrolltoend();
+
+            new Audio("{% static 'media/sent.mp3' %}").play();
+
+            //restore the button
+            $("#send_btn").html(
+                '<i class="fa fa-paper-plane" aria-hidden="true"></i>'
+            );
+        });
+        
+        var TypingStatusSend = false;
+        $("#msg_field").on("keypress", function () {
+            var send_status2 = {
+                status: "typing",
+                for: getUserName(),
+            };
+            if(TypingStatusSend == false){
+                send_status2 = JSON.stringify(send_status2);
+                TypingStatusSend = true;
+                socket.send(send_status2);
+                OnlineStatusSend = false;
+            }
+
+        });
+
+        //check if message field looses focus, then send status not typing
+        var OnlineStatusSend = false;
+        $("#msg_field").on("focusout", function () {
+            var send_status2 = {
+                status: "online",
+                for: getUserName(),
+            };
+            if(OnlineStatusSend == false){
+                send_status2 = JSON.stringify(send_status2);
+                socket.send(send_status2);
+                OnlineStatusSend = true;
+                loaderstatus = 0;
+                TypingStatusSend = false;
+            }
+        });
+            
+        
+
+        //check if message field is empty, then send status not typing
+        var OnlineStatusSend = false;
+        $("#msg_field").on("input", function () {
+            if ($("#msg_field").val() == "") {
+                var send_status2 = {
+                    status: "online",
+                    for: getUserName(),
+                };
+                if(OnlineStatusSend == false){
+                    send_status2 = JSON.stringify(send_status2);
+                    socket.send(send_status2);
+                    loaderstatus = 0;
+                    TypingStatusSend = false;
+                    OnlineStatusSend = true;
+                }
+            }
+        });
+
+        //on press enter and press send button send the not typing status
+        var OnlineStatusSend = false;
+        $("#msg_field").on("keypress", function (e) {
+            if (e.which == 13) {
+                var send_status2 = {
+                    status: "online",
+                    for: getUserName(),
+                };
+                if(OnlineStatusSend == false){
+                    send_status2 = JSON.stringify(send_status2);
+                    socket.send(send_status2);
+                    loaderstatus = 0;
+                    TypingStatusSend = false;
+                    OnlineStatusSend = true;
+                }
+            }
+        });
+
+        // Websocket script end
+    </script>
+</body>
+
+</html>

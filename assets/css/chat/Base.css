@@ -1,0 +1,81 @@
+.html {
+  font-family: "Nunito", sans-serif;
+}
+
+.circle-icon {
+  background: #badcf3;
+  padding: 20px;
+  border-radius: 60%;
+}
+
+/* Show only navbar, nothing else on mobile device */
+
+@media (max-width: 768px) {
+  .main {
+    display: none;
+  }
+}
+
+/* make the navbar full sized in mobile device */
+@media (max-width: 768px) {
+  .sidenav {
+    width: 100%;
+  }
+  /* replace menubar button with add friend icon */
+  .dropdown {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+  }
+  /* hide mobile menu in all those devices, which are not mobile */
+  @media (max-width: 768px) {
+    .mobile-menu {
+      display: inline;
+    }
+  }
+
+  @media (min-width: 600px) {
+    .mobile-menu {
+      display: none;
+    }
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.greet{
+  margin-top: 15vh; 
+  text-align: center;
+}
+
+.greet-tagline{
+  margin-top: 25vh; 
+  text-align: center
+}
+
+.built-credit{
+  margin-top: 43vh; 
+  text-align: center
+}
+
+.add-user-input{
+  width: 210px;
+}
+
+.top-nav-header{
+  color: rgb(180, 237, 232);
+  padding-left: 7vh;
+  display: block-content;
+  text-align: center;
+}
+
+.top-nav-list{
+  border: none; 
+  background-color: transparent;
+}

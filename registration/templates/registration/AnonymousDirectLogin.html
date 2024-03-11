@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="description" content="PrivatePing - Anynoumous Direct Login" />
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Nunito&family=Open+Sans:ital,wght@0,300;0,400;1,300&family=Solitreo&display=swap"
+    rel="stylesheet" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" href="{% static 'css/registration/AnonymousDirectLogin.css' %}" />
+
+  <!--define favicon for all devices-->
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicons/apple-touch-icon.png' %}" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicons/favicon-32x32.png' %}" />
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicons/favicon-16x16.png' %}" />
+
+  <!--define favicon for android chrome-->
+  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/favicons/android-chrome-192x192.png' %}" />
+  <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/favicons/android-chrome-512x512.png' %}" />
+
+  <!--define favicon general-->
+  <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
+
+  <title>PrivatePing - Anonymous Direct Login</title>
+</head>
+
+<body>
+  <div id="login-form"> {% csrf_token %}
+    <span class="DirectLoginLoader"></span>
+    <h1 style="text-align: center" id="processing">Checking Browser...</h1>
+    <small style="text-align: center">This temporary account will be deleted, once you Logout.</small>
+  </div>
+
+  <script type="text/javascript" src="{% static 'js/registration/AnonymousDirectLogin.js' %}"></script>
+</body>
+
+</html>

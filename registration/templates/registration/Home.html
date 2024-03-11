@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="description"
+    content="PrivatePing - Discover unparalleled privacy with our secure web messaging app. Enjoy end-to-end encryption, automatic message deletion on refresh, key rotation with each login, and anonymous login options. Chat securely and anonymously with peace of mind." />
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Nunito&family=Open+Sans:ital,wght@0,300;0,400;1,300&family=Solitreo&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/registration/registration_home.css' %}" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+  <!--define favicon for all devices-->
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicons/apple-touch-icon.png' %}" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicons/favicon-32x32.png' %}" />
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicons/favicon-16x16.png' %}" />
+
+  <!--define favicon for android chrome-->
+  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/favicons/android-chrome-192x192.png' %}" />
+  <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/favicons/android-chrome-512x512.png' %}" />
+
+  <!--define favicon general-->
+  <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
+
+  <title>PrivatePing: A secure messaging Application</title>
+</head>
+
+<body>
+  <span id="pageloader" class="pageloader"></span>
+
+  <div id="Maincontent" class="container">
+    <img class="logo" src="{% static '/images/logo/png/logo-no-background.png' %}" alt="Logo" />
+    <div class="buttons">
+      <button onclick="login();">Login</button>
+      <button onclick="register();">Signup</button>
+    </div>
+    <div class="buttons">
+      <button onclick="anonymousLogin();">Anonymous Direct Login</button>
+    </div>
+    <b>
+      <p style="color:#686868; margin-top: 2rem; margin-bottom: 0;">Do you know?</p>
+    </b>
+    <small style="color: #686868;">{{fact}}</small>
+    <div class="buttons">
+      <h5 style="text-align: center" id="credits">An open source project, Initiated by
+        <a href="https://linkedin.com/in/princekhunt">Prince Khunt</a> &
+        <a href="https://www.linkedin.com/in/viraj-bhingradiya-720b39216">Viraj Bhingradiya</a>. Checkout project on <a
+          href="https://github.com">Github</a>.
+      </h5>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="{% static 'js/registration/registration_home.js' %}"></script>
+  <script>
+    function login() {
+      window.location.href = "{% url 'registration:login' %}";
+    }
+    function register() {
+      window.location.href = "{% url 'registration:register' %}";
+    }
+
+    function anonymousLogin() {
+      window.location.href =
+        "{% url 'registration:anonymous_direct_login' %}";
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+{% extends "chat/Base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/chat/waiting_room.css' %}">
+<div class="text-center">
+    <h1 id="waiting_text">Waiting for <u>{{friend}}</u> to connect</h1>
+</div>
+<div id="loader-position">
+    <span class="loader"></span>
+</div>
+
+<script>
+
+    var text = document.getElementById("waiting_text");
+    var dots = 0;
+    var dots_interval = setInterval(function () {
+        if (dots < 3) {
+            text.innerHTML += ".";
+            dots++;
+        } else {
+            text.innerHTML = "Waiting for <u>{{friend}}</u> to connect";
+            dots = 0;
+        }
+    }, 500);
+</script>
+
+<script type="text/javascript" src="{% static 'js/chat/waiting_room.js' %}"></script>
+
+{% endblock %}

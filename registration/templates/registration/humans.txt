@@ -1,0 +1,21 @@
+/* PROJECT */
+- Project Name: PrivatePing
+- Description: A secure messaging platform for private communication.
+
+/* TEAM */
+Project Lead: Prince Khunt [https://www.linkedin.com/in/princekhunt/]
+
+Developers: Prince Khunt [https://www.linkedin.com/in/princekhunt/], Viraj Bhingradiya [https://www.linkedin.com/in/viraj-bhingradiya-720b39216]
+Contributors: Prince Khunt, Viraj Bhingradiya, and You?
+
+/* SITE */
+- Website: https://privateping.plutoweb.live
+- GitHub: https://github.com/princekhunt/privateping
+- License: MIT License
+
+/* THANKS */
+Thanks to all the developers and contributors who made this website possible.
+
+/* NOTES */
+- Contributions are welcome! Check out our GitHub repository for more information.
+- Feel free to reach out if you'd like to be added to the contributors list!

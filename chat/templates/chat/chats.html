@@ -1,0 +1,76 @@
+{% extends "chat/Base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/chat/chats.css' %}">
+
+<div style="margin-top: 0px">
+    <h3>{{friend.name}}</h3>
+    <span id="live-notification-dot" class="logged-in">● </span><small id="live-notification-text">Connecting...</small>
+</div>
+<p class="text-center"><i class="fa-solid fa-lock"></i> Messages are End-to-End encrypted!</p>
+<p onclick="window.location.href='/';"
+    style="cursor: pointer; color:rgb(200, 57, 57); text-align: right; margin-bottom: 5vh;"> <i
+        class="fa fa-trash-can fa-xl" aria-hidden="true" onclick="window.location.reload();"></i> Trash Messages </p>
+<p id="typing" style="color: green; font-size: 1em; margin-top: -10px;"></p>
+
+<div class="messages" id="board">
+    {% block message %}
+    {% endblock %}
+</div>
+<div class="row">
+    <form method="post" class="form-group" id="chat-box">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <input style="border-radius: 15px;" type="text" placeholder=" Enter your message" name="message"
+                    id="msg_field" autocomplete="off"> &nbsp; &nbsp;
+                <button style="border-radius: 50%;" type="submit" name="send" class="btn btn-primary" id="send_btn"> <i
+                        class="fa-solid fa-paper-plane"></i></button>
+
+            </div>
+        </div>
+    </form>
+</div>
+<small id="note"></small>
+
+
+<script>
+    var messageBody = document.querySelector('.messages');
+    messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
+
+    sender_id = "{{ friend.id }}";
+    receiver_id = "{{ curr_user.id }}";
+
+    function scrolltoend() {
+        $('#board').stop().animate({
+            scrollTop: $('#board')[0].scrollHeight
+        }, 800);
+    }
+
+    const text_box = '<div class="container darker">' +
+        '<img src="{% static 'images/user_image.jpg' %}" alt="Avatar" class="right" style="width:100%;">' +
+    '<p>{description}</p>' +
+        '<span class="time-right">{time}</span>' +
+        '</div>'
+</script>
+
+<script>
+    var input = document.getElementById("msg_field");
+    //allow only 190 words
+    input.addEventListener("input", function () {
+        if (this.value.length > 190)
+            document.getElementById("note").innerHTML = "Only 190 characters are allowed!";
+
+        this.value = this.value.slice(0, 190);
+        //show note that only 190 characters are allowed
+    });
+    //remove note when user stops typing
+    input.addEventListener("blur", function () {
+        document.getElementById("note").innerHTML = "";
+    });
+</script>
+
+<script src="{% static 'js/chat/chats.js' %}"></script>
+
+{% endblock %}

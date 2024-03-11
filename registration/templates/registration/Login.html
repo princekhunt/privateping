@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description"
+        content="PrivatePing - Secure your conversations with our encrypted messaging platform. Experience peace of mind with end-to-end encryption, automatic message deletion, key rotation, and anonymous login options. Protect your privacy while staying connected securely.">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Nunito&family=Open+Sans:ital,wght@0,300;0,400;1,300&family=Solitreo&display=swap"
+        rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="{% static 'css/registration/Login.css' %}">
+
+    <!--define favicon for all devices-->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicons/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicons/favicon-16x16.png' %}">
+
+    <!--define favicon for android chrome-->
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/favicons/android-chrome-192x192.png' %}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/favicons/android-chrome-512x512.png' %}">
+
+    <!--define favicon general-->
+    <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}">
+    <title>PrivatePing - Login</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+
+    <span id="pageloader" class="pageloader"></span>
+
+    <div id="Maincontent">
+
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+            width="100%" height="100%" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+            <defs>
+                <linearGradient id="bg">
+                    <stop offset="0%" style="stop-color:rgba(130, 158, 249, 0.06)"></stop>
+                    <stop offset="50%" style="stop-color:rgba(76, 190, 255, 0.6)"></stop>
+                    <stop offset="100%" style="stop-color:rgba(115, 209, 72, 0.2)"></stop>
+                </linearGradient>
+                <path id="wave" fill="url(#bg)" d="M-363.852,502.589c0,0,236.988-41.997,505.475,0
+	s371.981,38.998,575.971,0s293.985-39.278,505.474,5.859s493.475,48.368,716.963-4.995v560.106H-363.852V502.589z" />
+            </defs>
+            <g>
+                <use xlink:href='#wave' opacity=".3">
+                    <animateTransform attributeName="transform" attributeType="XML" type="translate" dur="10s"
+                        calcMode="spline" values="270 230; -334 180; 270 230" keyTimes="0; .5; 1"
+                        keySplines="0.42, 0, 0.58, 1.0;0.42, 0, 0.58, 1.0" repeatCount="indefinite" />
+                </use>
+                <use xlink:href='#wave' opacity=".6">
+                    <animateTransform attributeName="transform" attributeType="XML" type="translate" dur="8s"
+                        calcMode="spline" values="-270 230;243 220;-270 230" keyTimes="0; .6; 1"
+                        keySplines="0.42, 0, 0.58, 1.0;0.42, 0, 0.58, 1.0" repeatCount="indefinite" />
+                </use>
+                <use xlink:href='#wave' opacty=".9">
+                    <animateTransform attributeName="transform" attributeType="XML" type="translate" dur="6s"
+                        calcMode="spline" values="0 230;-140 200;0 230" keyTimes="0; .4; 1"
+                        keySplines="0.42, 0, 0.58, 1.0;0.42, 0, 0.58, 1.0" repeatCount="indefinite" />
+                </use>
+            </g>
+        </svg>
+
+
+        <div style="position: relative;" id="login-container">
+            <h1 style="color: antiquewhite;">PrivatePing - Login</h1>
+            <div id="login-form">
+                <img src="{% static  'images/user/login.gif' %}" alt="Loading" id="loading-gif" height="40%"
+                    width="40%">
+                <h1 style="color: antiquewhite;" id="processing"></h1>
+                <form id="LoginForm" method="post">{% csrf_token %}
+                    <div id="username-form">
+                        <div class="input-container">
+                            <input type="text" class="input-field input-field-1" id="username" name="username"
+                                placeholder="Username">
+                            <button class="login-button" id="username-button">&rarr;</button>
+                        </div>
+                    </div>
+                    <div id="password-field">
+                        <div class="input-container">
+                            <input type="password" class="input-field input-field-2" id="password" name="password"
+                                placeholder="Password">
+                            <button type="submit" class="login-button" id="login-button"><span>&#10003;</span></button>
+                        </div>
+                    </div>
+                    {% if error %}
+                    <div id="error-field"
+                        style="color: rgb(253, 84, 84); font-size: 18px; font-weight: bold; margin-top: 10px;">Invalid
+                        username or password!</div>
+                    {% endif %}
+            </div>
+            </form>
+            <p style="color:cornsilk; margin-top: 2rem;">Do you know?</p>
+            <small style="color: #ccc;">{{fact}}</small>
+
+        </div>
+    </div>
+    <script type="text/javascript" src="{% static 'js/registration/Login.js' %}"></script>
+</body>
+
+</html>

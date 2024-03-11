@@ -1,0 +1,92 @@
+.html{
+    font-family: 'Nunito', sans-serif;
+}
+.sidenav{
+    height: 100%;
+    width: 320px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    background: linear-gradient(to bottom, #0084c2 0%, #00428e 50%, #002871 100%);
+    padding-top: 20px;
+}
+
+.sidenav a{
+    text-decoration: none;
+    padding: 6px 8px 6px 16px;
+    font-size: 24px;
+    display: block;
+    color: #000;
+}
+
+.sidenav a:hover{
+    color: #f1f1f1;
+}
+
+
+.main{
+    z-index: 10;
+    overflow: hidden;
+    margin-left: 320px;
+    padding: 0px 10px;
+}
+
+
+.dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #3e8e41;
+}
+
+#myInput {
+    box-sizing: border-box;
+    background-image: url("{% static 'images/searchicon.png' %}")
+    background-position: 14px 12px;
+    background-repeat: no-repeat;
+    font-size: 16px;
+    padding: 14px 20px 12px 45px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+}
+
+#myInput:focus {outline: 3px solid #ddd;}
+
+.dropdown {
+    z-index: 10;
+    float: right;
+    position: relative;
+    display: inline-block;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f6f6f6;
+    min-width: 230px;
+    overflow: auto;
+    border: 1px solid #ddd;
+    z-index: 20;
+}
+
+.dropdown-content a {
+    z-index: 10;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    z-index: 20;
+}
+
+.dropdown a:hover {background-color: #ddd;}
+
+.show {display: block;}

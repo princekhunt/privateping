@@ -1,0 +1,184 @@
+.userloader {
+  width: 250px;
+  height: 250px;
+  position: relative;
+  overflow: hidden;
+}
+.userloader:before,
+.userloader:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #8ebff4;
+  transform: translate(-50%, 100%) scale(0);
+  animation: push 4s infinite ease-in;
+}
+.userloader:after {
+  animation-delay: 2s;
+}
+@keyframes push {
+  0% {
+    transform: translate(-50%, 100%) scale(1);
+  }
+  15%,
+  25% {
+    transform: translate(-50%, 50%) scale(1);
+  }
+  50%,
+  75% {
+    transform: translate(-50%, -30%) scale(0.5);
+  }
+  80%,
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
+
+.pageloader {
+  font-size: 48px;
+  color: #007bff;
+  width: 1em;
+  height: 1em;
+  box-sizing: border-box;
+  background-color: currentcolor;
+  position: relative;
+  border-radius: 50%;
+  transform: rotateX(-60deg) perspective(1000px);
+}
+.pageloader:before,
+.loader:after {
+  content: "";
+  display: block;
+  position: absolute;
+  box-sizing: border-box;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
+  border-radius: inherit;
+  animation: flowerFlow 1s ease-out infinite;
+}
+.pageloader:after {
+  animation-delay: 0.4s;
+}
+
+@keyframes flowerFlow {
+  0% {
+    opacity: 1;
+    transform: rotate(0deg);
+    box-shadow: 0 0 0 -0.5em currentcolor, 0 0 0 -0.5em currentcolor,
+      0 0 0 -0.5em currentcolor, 0 0 0 -0.5em currentcolor,
+      0 0 0 -0.5em currentcolor, 0 0 0 -0.5em currentcolor,
+      0 0 0 -0.5em currentcolor, 0 0 0 -0.5em currentcolor;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(180deg);
+    box-shadow: -1em -1em 0 -0.35em currentcolor,
+      0 -1.5em 0 -0.35em currentcolor, 1em -1em 0 -0.35em currentcolor,
+      -1.5em 0 0 -0.35em currentcolor, 1.5em -0 0 -0.35em currentcolor,
+      -1em 1em 0 -0.35em currentcolor, 0 1.5em 0 -0.35em currentcolor,
+      1em 1em 0 -0.35em currentcolor;
+  }
+}
+
+* {
+  padding: 0;
+  margin: 0;
+}
+svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: block;
+  background-color: #0e4166;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(14, 65, 102, 0.86),
+    #0e4166
+  );
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  font-family: "Nunito", sans-serif;
+}
+.img {
+  display: block;
+}
+#login-container {
+  text-align: center;
+}
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-container {
+  position: relative;
+  overflow: hidden; /* Ensures the overflow is hidden for animation */
+}
+
+.input-field {
+  width: 250px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.login-button {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 0 5px 5px 0;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}
+
+.login-button:active {
+  background-color: #004080;
+}
+
+#username-field {
+  display: none;
+}
+
+#password-field-1 {
+  display: none;
+}
+
+#password-field-2 {
+  display: none;
+}

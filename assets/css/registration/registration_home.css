@@ -1,0 +1,271 @@
+/* smaller devices */
+@media (max-width: 768px) {
+  #credits {
+    margin-top: 30px;
+  }
+}
+
+.loader {
+  width: 84px;
+  height: 84px;
+  position: relative;
+  overflow: hidden;
+}
+.loader:before,
+.loader:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate(-50%, 100%) scale(0);
+  animation: push 2s infinite ease-in;
+}
+.loader:after {
+  animation-delay: 1s;
+}
+@keyframes push {
+  0% {
+    transform: translate(-50%, 100%) scale(1);
+  }
+  15%,
+  25% {
+    transform: translate(-50%, 50%) scale(1);
+  }
+  50%,
+  75% {
+    transform: translate(-50%, -30%) scale(0.5);
+  }
+  80%,
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
+
+.pageloader {
+  font-size: 48px;
+  color: #007bff;
+  width: 1em;
+  height: 1em;
+  box-sizing: border-box;
+  background-color: currentcolor;
+  position: relative;
+  border-radius: 50%;
+  transform: rotateX(-60deg) perspective(1000px);
+}
+.pageloader:before,
+.loader:after {
+  content: "";
+  display: block;
+  position: absolute;
+  box-sizing: border-box;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
+  border-radius: inherit;
+  animation: flowerFlow 1s ease-out infinite;
+}
+.pageloader:after {
+  animation-delay: 0.4s;
+}
+
+@keyframes flowerFlow {
+  0% {
+    opacity: 1;
+    transform: rotate(0deg);
+    box-shadow: 0 0 0 -0.5em currentcolor, 0 0 0 -0.5em currentcolor,
+      0 0 0 -0.5em currentcolor, 0 0 0 -0.5em currentcolor,
+      0 0 0 -0.5em currentcolor, 0 0 0 -0.5em currentcolor,
+      0 0 0 -0.5em currentcolor, 0 0 0 -0.5em currentcolor;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(180deg);
+    box-shadow: -1em -1em 0 -0.35em currentcolor,
+      0 -1.5em 0 -0.35em currentcolor, 1em -1em 0 -0.35em currentcolor,
+      -1.5em 0 0 -0.35em currentcolor, 1.5em -0 0 -0.35em currentcolor,
+      -1em 1em 0 -0.35em currentcolor, 0 1.5em 0 -0.35em currentcolor,
+      1em 1em 0 -0.35em currentcolor;
+  }
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  font-family: "Nunito", sans-serif;
+}
+
+.container {
+  text-align: center;
+}
+
+.logo {
+  /* center vertical and horizontal */
+  margin: auto;
+  display: block;
+
+  margin-top: 8%;
+
+  max-width: 45%;
+  max-height: 45%;
+}
+
+.buttons {
+  margin-top: 20px;
+}
+
+.buttons button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .buttons button {
+    font-size: 14px;
+  }
+
+  .logo {
+    max-width: 80%;
+    max-height: 80%;
+  }
+}
+
+/* animation to fade the logo in */
+.container {
+  animation: fadein 2s;
+  -moz-animation: fadein 2s;
+  /* Firefox */
+  -webkit-animation: fadein 2s;
+  /* Safari and Chrome */
+  -o-animation: fadein 2s;
+  /* Opera */
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes fadein {
+  /* Firefox */
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadein {
+  /* Safari and Chrome */
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@-o-keyframes fadein {
+  /* Opera */
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* animation the button on hover */
+.buttons button:hover {
+  animation: pulse 1s;
+  -moz-animation: pulse 1s;
+  /* Firefox */
+  -webkit-animation: pulse 1s;
+  /* Safari and Chrome */
+  -o-animation: pulse 1s;
+  /* Opera */
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@-moz-keyframes pulse {
+  /* Firefox */
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@-webkit-keyframes pulse {
+  /* Safari and Chrome */
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@-o-keyframes pulse {
+  /* Opera */
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
