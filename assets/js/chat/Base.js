@@ -1,11 +1,12 @@
 function getUserName(){
     //check if current page is waiting room without function
     if (window.location.href.indexOf("waiting-room") > -1) {
-        name = 'user'
-        name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        name = 'user';
+        name = name.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        
     }
     else if (window.location.href.indexOf("chat") > -1) {
             // Remove trailing slashes if any
