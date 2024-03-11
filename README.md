@@ -66,3 +66,5 @@ We invite everyone to use this absolutely free application and suggest improveme
 ## License
 
 PrivatePing is licensed under the [MIT License](LICENSE).
+
+Special thanks to [@Madhur215](https://github.com/Madhur215/Django-ChatApp) for the groundwork and inspiration for this project.
