@@ -65,8 +65,4 @@ We invite everyone to use this absolutely free application and suggest improveme
 
 ## License
 
-<<<<<<< HEAD
 PrivatePing is licensed under the [MIT License](LICENSE).
-=======
-PrivatePing is licensed under the [MIT License](LICENSE).
->>>>>>> 7fc0cc00cdc8186dbf8b1ff4ca27f126d8b75c7d
