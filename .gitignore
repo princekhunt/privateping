@@ -162,4 +162,3 @@ cython_debug/
 
 dump.rdb
 db.sqlite3
-Procfile
