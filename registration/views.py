@@ -34,9 +34,9 @@ def Login(request):
             return redirect("registration:generate_keys")
         else:
             error_message = "Invalid credentials!"
-            return render(request, "registration/Login.html", {"error": error_message, "fact": fact.fact})
+            return render(request, "registration/Login.html", {"error": error_message, "fact": fact})
 
-    return render(request, "registration/Login.html", {"fact": fact.fact})
+    return render(request, "registration/Login.html", {"fact": fact})
 
 
 def GenerateKeys(request):
@@ -121,7 +121,7 @@ def Signup(request):
             return redirect("registration:login")
         else:
             return HttpResponse("<script>alert('Please enter valid details!'); window.location.href='/signup';</script>")
-    return render(request, "registration/Signup.html", {"fact": fact.fact})
+    return render(request, "registration/Signup.html", {"fact": fact})
 
 
 
