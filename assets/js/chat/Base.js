@@ -1,7 +1,12 @@
+function escapeHtml(text) {
+    return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 function getUserName(){
     //check if current page is waiting room without function
     if (window.location.href.indexOf("waiting-room") > -1) {
         name = 'user';
+        name = escapeHtml(name);
         name = name.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
         var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
         var results = regex.exec(location.search);
@@ -140,7 +145,3 @@ $(document).ready(function() {
         });
     })
 });
-
-function escapeHtml(text) {
-    return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}

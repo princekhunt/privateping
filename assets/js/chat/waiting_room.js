@@ -1,5 +1,10 @@
+function escapeHtml(text) {
+    return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 $(document).ready(function(){
     function getUrlParameter(name) {
+        name = escapeHtml(name);
         name = name.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
         var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
         var results = regex.exec(location.search);
