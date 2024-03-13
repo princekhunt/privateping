@@ -2,6 +2,10 @@ from .base import *
 
 import os
 import sentry_sdk
+import dj_database_url
+import django_heroku
+
+django_heroku.settings(locals())
 
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -37,13 +41,5 @@ CHANNEL_LAYERS = {
     }
 }
 
-DATABASES ={
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT')
-    }
-}
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
