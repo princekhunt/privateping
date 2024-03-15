@@ -1,1 +1,1 @@
-web uvicorn PrivatePing.asgi:application --host 0.0.0.0 --port $PORT --log-level debug
+web: bin/start-pgbouncer uvicorn PrivatePing.asgi:application --host 0.0.0.0 --port $PORT --log-level debug
