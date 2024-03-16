@@ -9,7 +9,6 @@
   width: 84px;
   height: 84px;
   position: relative;
-  overflow: hidden;
 }
 .loader:before,
 .loader:after {
@@ -116,8 +115,8 @@ html {
   /* center vertical and horizontal */
   margin: auto;
   display: block;
-  max-width: 50%;
-  max-height: 50%;
+  max-width: 45%;
+  max-height: 45%;
 }
 
 .buttons {
