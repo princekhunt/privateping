@@ -104,21 +104,20 @@ html {
   flex-direction: column;
   background-color: #f0f0f0;
   font-family: "Nunito", sans-serif;
+  overflow: hidden;
 }
 
 .container {
   text-align: center;
+  margin-top: 12%;
 }
 
 .logo {
   /* center vertical and horizontal */
   margin: auto;
   display: block;
-
-  margin-top: 8%;
-
-  max-width: 45%;
-  max-height: 45%;
+  max-width: 50%;
+  max-height: 50%;
 }
 
 .buttons {
