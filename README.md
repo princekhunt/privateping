@@ -50,6 +50,60 @@ PrivatePing employs a robust encryption system to ensure secure and private comm
 
 This comprehensive encryption process ensures that all communication on PrivatePing remains secure and private, with messages encrypted end-to-end and inaccessible to anyone other than the intended recipient.
 
+## Local Installation
+
+### Linux and Mac
+You can install PrivatePing locally on Linux and Mac devices using the provided installation script.
+
+1. Clone the repository.
+2. Open a terminal window.
+3. Navigate to the directory where the `install.sh` script is located.
+4. Run the following command to make the script executable:
+   ```bash
+   chmod +x install.sh
+5. Eecute the script by running:
+   ```bash
+   ./install.sh
+
+### Windows (Alternative Method for Linux and Mac)
+
+If you prefer not to use the provided installation script or encounter any issues, you can manually install PrivatePing on Linux and Mac using the following steps:
+
+1. **Install Python 3:** If you haven't already, install Python 3 on your system. You can download it from [Python's official website](https://www.python.org/downloads/).
+
+2. **Install Virtualenv:** This command installs Virtualenv, a tool used to create isolated Python environments.
+   ```bash
+   pip3 install virtualenv
+3. **Clone the repository with the following command:**
+   ```bash
+   git clone https://github.com/princekhunt/privateping.git
+4. **Create a Virtual Environment:** This command creates a virtual environment named `venv` in the current directory.
+   ```bash
+   python3 -m venv venv
+5. **Activate the Virtual Environment:** Activating the virtual environment isolates your Python environment, ensuring dependencies are installed locally rather than globally.
+   - If you are using linux or mac, Activate virtual environment using:
+     ```bash
+     source venv/bin/activate
+   - If you are using windows, Activate virtual environment using:
+     ```bash
+     venv\Scripts\activate
+
+7. **Install Dependencies:** This command installs all required Python packages specified in the `requirements.txt` file.
+   ```bash
+   pip3 install -r requirements.txt
+8. **Create `.env` File:** These commands create a .env file in the `PrivatePing/settings` directory with environment variable configurations. (Recommendation: Generate a new SECRET_KEY and replace it with the defined here.)
+   ```bash
+   echo "SECRET_KEY='*$j@tpltfyblml&*1d+n9t@il^0xef4=bvdu&!7r=zvoq$a19g'" > PrivatePing/settings/.env
+   echo "SECRET_ADMIN_URL=''" >> PrivatePing/settings/.env
+9. **Run Database Migrations:** This command applies migrations to create necessary database tables.
+   ```bash
+   python3 manage.py migrate
+
+10. **Start the Server:** This command starts the Django development server. You can access PrivatePing through your web browser at http://localhost:8000.
+    ```bash
+    python3 manage.py runserver
+
+
 ## Contributors
 
 We extend our heartfelt gratitude to all contributors who have helped improve PrivatePing! Your efforts are greatly appreciated. See the [humans.txt](https://privateping.plutoweb.live/humans.txt) page for a list of contributors.
