@@ -22,7 +22,7 @@ socket3.addEventListener('message', function (e) {
     if (data.status == 'offline') {
         if (count >= 3) {
             alert("User disconnected. Navigating you to the home page.");
-            window.location.href = '/';
+            parent.location.href = "/";
         }
         else {
             count++;
@@ -53,3 +53,18 @@ document.getElementById("msg_field").addEventListener("input", function(){
 alert("Please wait, User is connecting...");
 document.getElementById("msg_field").disabled = true;
 document.getElementById("send_btn").disabled = true;
+
+function trashmessages(){
+    //play sound
+    var audio = new Audio('/static/media/delete.mp3');
+    audio.play();
+
+    //Remove all messages whose id is ChatMessage
+    var chatMessages = document.querySelectorAll('#ChatMessage');
+
+    // Iterate through each element and remove it
+    chatMessages.forEach(function(element) {
+        element.remove();
+    });
+
+}

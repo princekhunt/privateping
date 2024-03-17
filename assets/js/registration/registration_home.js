@@ -7,3 +7,4 @@ window.addEventListener("load", function () {
   $("#Maincontent").delay(500).fadeIn();
   $("#credits").delay(500).fadeIn();
 });
+parent.document.title = "PrivatePing: A secure messaging Application";

@@ -62,3 +62,5 @@ async function main() {
 }
 
 main();
+
+parent.document.title = "PrivatePing - Securing Session";

@@ -163,3 +163,5 @@ window.addEventListener("load", function () {
   $("#pageloader").fadeOut();
   $("#Maincontent").delay(500).fadeIn();
 });
+
+parent.document.title = "PrivatePing - Signup";

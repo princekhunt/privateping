@@ -9,6 +9,7 @@ import base64
 import urllib
 from registration.models import user_type
 from chat.tools import getFriendsList, getUserId
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 def index(request):
     if not request.user.is_authenticated:
@@ -38,7 +39,7 @@ def addFriend(request, name):
 
     return redirect("/dashboard")
 
-
+@xframe_options_exempt
 def chat(request, username):
     try:
         friend = UserProfile.objects.get(username=username)
@@ -68,6 +69,7 @@ def chat(request, username):
         response.set_cookie('public_key', public_key)
         return response
 
+@xframe_options_exempt
 def waiting_room(request):
 
     if not request.user.is_authenticated:
@@ -90,7 +92,8 @@ def waiting_room(request):
         return render(request, "chat/waiting_room.html", {"friend": friend.name, 'friends': friends})
     except:
         return HttpResponse("<script>alert('something went wrong'); window.location.href='/';</script>")
-
+    
+@xframe_options_exempt
 def room(request):
     if request.method == "GET":
         ForUser = request.GET.get("user")

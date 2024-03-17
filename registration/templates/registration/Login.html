@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="description"
         content="PrivatePing - Secure your conversations with our encrypted messaging platform. Experience peace of mind with end-to-end encryption, automatic message deletion, key rotation, and anonymous login options. Protect your privacy while staying connected securely.">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' {{domain}}">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <link
         href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Nunito&family=Open+Sans:ital,wght@0,300;0,400;1,300&family=Solitreo&display=swap"
@@ -71,7 +72,7 @@
         <div style="position: relative;" id="login-container">
             <h1 style="color: antiquewhite;">PrivatePing - Login</h1>
             <div id="login-form">
-                <img src="{% static  'images/user/login.gif' %}" alt="Loading" id="loading-gif" height="40%"
+                <img src="{% static 'images/user/login.gif' %}" alt="Loading" id="loading-gif" height="40%"
                     width="40%">
                 <h1 style="color: antiquewhite;" id="processing"></h1>
                 <form id="LoginForm" method="post">{% csrf_token %}

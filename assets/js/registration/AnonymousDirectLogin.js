@@ -53,3 +53,5 @@ setTimeout(function () {
     sendRequest();
   }
 }, 1000);
+
+parent.document.title = "PrivatePing - Anonymous Direct Login";
