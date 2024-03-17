@@ -54,4 +54,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, '../assets/')
 
 DISABLE_SERVER_SIDE_CURSORS = True
 
-DOMAIN = "https://privateping.plutoweb.live"
+DOMAIN = "https://dev.privateping.plutoweb.live"
