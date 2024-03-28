@@ -1,0 +1,21 @@
+{
+    "name": "Heroku CI",
+    "description": "Configuration file for Heroku CI",
+    "env": {
+        "CI": "true"
+    },
+    "buildpacks": [
+        {
+            "url": "heroku/python"
+        }
+    ],
+    "scripts": {
+        "test": "python manage.py test"
+    },
+    "formation": {
+        "web": {
+            "quantity": 1,
+            "size": "standard-1X"
+        }
+    }
+}

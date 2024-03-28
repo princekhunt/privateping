@@ -8,6 +8,7 @@ urlpatterns = [
     path("dashboard", views.index, name="dashboard"),
     path("addfriend/<str:name>", views.addFriend, name="addFriend"),
     path("chat/<str:username>", views.chat, name="chat"),
+    path("request", views.FriendRequest, name="FriendRequest"),
     path('waiting-room', views.waiting_room, name="waiting-room"),
     path('api/room', views.room, name='room'),
 

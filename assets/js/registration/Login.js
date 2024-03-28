@@ -33,17 +33,20 @@ document.getElementById("password").addEventListener("keyup", function (event) {
     document.getElementById("login-button").click();
   }
 });
-document
-  .getElementById("login-button")
-  .addEventListener("click", function (event) {
-    event.preventDefault();
-    document.getElementById("LoginForm").style.display = "none";
-    document.getElementById("processing").innerHTML = "Logging you in...";
 
-    document.getElementById("LoginForm").submit();
-  });
 
-//hide form
+function FormProcessing() {
+  event.preventDefault();
+  document.getElementById("LoginForm").style.display = "none";
+  document.getElementById("processing").innerHTML = "Logging you in...";
+
+  document.getElementById("LoginForm").submit();
+}
+
+var login_button = document.getElementById("login-button");
+login_button.addEventListener("click", FormProcessing);
+login_button.addEventListener("submit", FormProcessing);
+
 
 // Hide the loader when the page is fully loader
 document.getElementById("Maincontent").style.display = "none";
@@ -52,3 +55,11 @@ window.addEventListener("load", function () {
   $("#pageloader").fadeOut();
   $("#Maincontent").delay(500).fadeIn();
 });
+
+//goback
+function goback(){
+  window.history.back();
+
+}
+
+parent.document.title = "PrivatePing - Login";

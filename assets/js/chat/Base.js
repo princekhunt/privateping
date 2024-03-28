@@ -125,8 +125,11 @@ $(document).ready(function() {
             },
             success: function(response){
                 if(response.status == "ok"){
+                    console.log("ok1");
                     if(!response.available){
+                        console.log("ok2")
                         if(!response.self){
+                            console.log("ok3")
                         $('#finduser').css('border', '2px solid green');
                         $('#adduserbutton').prop('disabled', false);
                         }
@@ -145,3 +148,16 @@ $(document).ready(function() {
         });
     })
 });
+
+//limit note length
+$(document).ready(function() {
+    $('#note').on('keyup', function(){
+        var note = $('#note').val();
+        if(note.length > 100){
+            $('#note').val(note.substring(0, 100));
+        }
+    })
+});
+
+
+parent.document.title = "PrivatePing - A Secure Chat Room";

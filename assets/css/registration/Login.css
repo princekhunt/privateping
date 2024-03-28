@@ -144,3 +144,9 @@ html {
 #password-button.active {
   display: block;
 }
+
+.back-btn{
+  margin-top:5rem; 
+  border-radius: 50%;
+  opacity: 0.8;
+}

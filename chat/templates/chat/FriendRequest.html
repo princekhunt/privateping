@@ -1,0 +1,66 @@
+{% extends "chat/Base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    i.size {
+       font-size: 100px;
+    }
+ </style>
+<link rel="stylesheet" href="{% static 'css/chat/FriendRequest.css' %}">
+<div class="text-center">
+    <h1 id="request-text">You have received friend request from: <u>{{RequestFrom}}</u></h1>
+    {% if note %}
+    <h5>Request Note: <b>{{note}}</b></h5>
+    {% endif %}
+    <br>
+    <button class="btn btn-outline-success request-button" id="accept-button"><i class="fa-solid fa-check"></i> </button>
+    Accept
+
+    &nbsp;&nbsp;&nbsp;
+
+    <button class="btn btn-outline-danger request-button" id="reject-button"><i class="fa-solid fa-xmark"></i></button>
+    Reject
+</div>
+
+<script>
+    //Ajax request to accept or reject friend request
+    document.getElementById("accept-button").addEventListener("click", function () {
+        $.ajax({
+            type: "POST",
+            url: "{% url 'chat:FriendRequest' %}",
+            data: {
+                'csrfmiddlewaretoken': "{{ csrf_token }}",
+                'request_from': "{{RequestFrom}}",
+                'action': "accept"
+
+            },
+            success: function (data) {
+                alert("Friend request accepted");
+                window.location.href = "{% url 'chat:dashboard' %}";
+            }
+        });
+    });
+
+    document.getElementById("reject-button").addEventListener("click", function () {
+        $.ajax({
+            type: "POST",
+            url: "{% url 'chat:FriendRequest' %}",
+            data: {
+                'csrfmiddlewaretoken': "{{ csrf_token }}",
+                'request_from': "{{RequestFrom}}",
+                'action': "reject"
+
+            },
+            success: function (data) {
+                alert("Friend request rejected");
+                window.location.href = "{% url 'chat:dashboard' %}";
+            }
+        });
+    });
+
+</script>
+
+<script type="text/javascript" src="{% static 'js/chat/waiting_room.js' %}"></script>
+
+{% endblock %}

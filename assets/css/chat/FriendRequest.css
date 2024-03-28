@@ -1,0 +1,14 @@
+#request-text {
+    margin-top: 15rem;
+    font-size: 2rem;
+    color: #050d55;
+    font-weight: bold;
+    font-family: 'Nunito', sans-serif;
+    text-align: center;
+}
+
+.request-button{
+    /* increase size of button */
+    padding: 20px 25px;
+    border-radius: 12px;
+}

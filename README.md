@@ -4,6 +4,7 @@
 </div>
 
 [![Website Status](https://img.shields.io/website?url=https%3A%2F%2Fprivateping.plutoweb.live)](https://privateping.plutoweb.live)
+[![first-timers](https://img.shields.io/badge/first--timers--friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 PrivatePing is a secure messaging application built on Python's Django framework, providing end-to-end encryption for messages exchanged between users. It leverages HTML, CSS, JavaScript, SubtleCrypto API, channels, and Redis to ensure secure communication channels.

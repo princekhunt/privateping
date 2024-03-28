@@ -182,3 +182,9 @@ html {
 #password-field-2 {
   display: none;
 }
+
+.back-btn{
+  margin-top:3rem; 
+  border-radius: 50%;
+  opacity: 0.8;
+}

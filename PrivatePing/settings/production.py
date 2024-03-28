@@ -12,7 +12,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 DEBUG = False
-ALLOWED_HOSTS = ['privateping.plutoweb.live']
+ALLOWED_HOSTS = ['privateping.plutoweb.live', 'dev.privateping.plutoweb.live']
 
 
 SECURE_HSTS_SECONDS = 60
@@ -53,3 +53,5 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, '../assets/')
 
 DISABLE_SERVER_SIDE_CURSORS = True
+
+DOMAIN = "https://privateping.plutoweb.live"

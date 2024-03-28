@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="description"
     content="PrivatePing - Discover unparalleled privacy with our secure web messaging app. Enjoy end-to-end encryption, automatic message deletion on refresh, key rotation with each login, and anonymous login options. Chat securely and anonymously with peace of mind." />
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' {{domain}}">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <link
     href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Nunito&family=Open+Sans:ital,wght@0,300;0,400;1,300&family=Solitreo&display=swap"
@@ -47,8 +48,10 @@
     <small style="color: #686868;">{{fact}}</small>
     <div class="buttons">
       <h5 style="text-align: center" id="credits">An open source project, Initiated by
-        <a href="https://linkedin.com/in/princekhunt">Prince Khunt</a> &
-        <a href="https://www.linkedin.com/in/viraj-bhingradiya-720b39216">Viraj Bhingradiya</a>. Checkout project on <a
+
+        <a target="_blank" href="https://linkedin.com/in/princekhunt">Prince Khunt</a> &
+        <a target="_blank" href="https://www.linkedin.com/in/viraj-bhingradiya-720b39216">Viraj Bhingradiya</a>. Checkout project on <a target="_blank"
+
           href="https://github.com/princekhunt/privateping">Github</a>.
       </h5>
     </div>

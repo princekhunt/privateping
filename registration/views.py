@@ -4,13 +4,18 @@ from django.contrib.auth import login, authenticate, logout
 from chat.models import UserProfile, Keys, Friends
 from django.http import JsonResponse, HttpResponse
 from registration.models import facts, user_type
-import random
 from registration.tools import generate_username
 from django.contrib.auth.models import User
-import time
+from PrivatePing.settings import DOMAIN
+import random
+#csrf
+from django.views.decorators.csrf import csrf_exempt
+
+
+domain = DOMAIN
+
 
 def Home(request):
-
     if request.user.is_authenticated:
         return redirect('chat:dashboard')
 
@@ -18,14 +23,20 @@ def Home(request):
     
     return render(request, "registration/Home.html", {"fact": fact})
 
+@csrf_exempt
 def Login(request):
-
     if request.user.is_authenticated:
         return redirect('chat:dashboard')
 
     fact = facts.objects.order_by('?').first()
     
     if request.method == "POST":
+        curr_host = request.META.get("HTTP_HOST")
+        if not curr_host.startswith("http"):
+            curr_host1 = "https://" + curr_host
+            curr_host2 = "http://" + curr_host
+        if curr_host1 != domain and curr_host2 != domain:
+            return HttpResponse("<script>alert('Invalid Request!'); window.location.href='/login';</script>")
         username = request.POST.get("username")
         password = request.POST.get("password")
         user = authenticate(username=username, password=password)
@@ -38,13 +49,12 @@ def Login(request):
 
     return render(request, "registration/Login.html", {"fact": fact})
 
-
 def GenerateKeys(request):
     if not request.user.is_authenticated:
         return redirect('registration:login')
 
     if request.method == "POST":
-        user = UserProfile.objects.get(email=request.user.email)
+        user = UserProfile.objects.get(user=request.user)
         public_key = request.POST.get("public_key")
         if Keys.objects.filter(user=user).exists():
             key = Keys.objects.get(user=user)
@@ -56,14 +66,13 @@ def GenerateKeys(request):
         return JsonResponse({"redirect": request.build_absolute_uri("/dashboard")})
 
     return render(request, "registration/GenerateKeys.html")
-         
 
 def Logout(request):
     if not request.user.is_authenticated:
         return redirect('registration:login')
         
     if request.user.is_authenticated:
-        user_profile = UserProfile.objects.get(email=request.user.email)
+        user_profile = UserProfile.objects.get(user=request.user)
         user_profile.online = 0
         user_profile.online_for = None
         if UserProfile.objects.filter(online_for=user_profile).exists():
@@ -77,7 +86,6 @@ def Logout(request):
             key.save()
         
         if user_type.objects.filter(user=request.user, type="Anonymous").exists():
-            # Unfriend
             if Friends.objects.filter(user=user_profile).exists():
                 friends = Friends.objects.filter(user=user_profile)
                 friends.delete()
@@ -89,13 +97,13 @@ def Logout(request):
 
         logout(request)
 
-    response = HttpResponse("<script>localStorage.clear();window.location.href = '"+ request.build_absolute_uri("../") +"';</script>")
+    response = HttpResponse("<script>localStorage.clear();parent.location.href = '/';</script>")
     response.delete_cookie("notified")
     response.delete_cookie("Anotified")
     response.delete_cookie("public_key")
     return response
 
-
+@csrf_exempt
 def Signup(request):
     if request.user.is_authenticated:
         return redirect('chat:dashboard')
@@ -103,6 +111,12 @@ def Signup(request):
     fact = facts.objects.order_by('?').first()
 
     if request.method == "POST":
+        curr_host = request.META.get("HTTP_HOST")
+        if not curr_host.startswith("http"):
+            curr_host1 = "https://" + curr_host
+            curr_host2 = "http://" + curr_host
+        if curr_host1 != domain and curr_host2 != domain:
+            return HttpResponse("<script>alert('Invalid Request!'); window.location.href='/login';</script>")
         data = request.POST.copy()
         data["email"] = data["username"] + "@noemailrequired.com"
         email = data["email"]
@@ -114,7 +128,7 @@ def Signup(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get("password1")
             user = form.save()
-            profile = UserProfile(email=email, name=name, username=username)
+            profile = UserProfile(user=user, name=name, username=username)
             profile.save()
             user_type_obj = user_type(user=user, type="regular")
             user_type_obj.save()
@@ -122,9 +136,6 @@ def Signup(request):
         else:
             return HttpResponse("<script>alert('Please enter valid details!'); window.location.href='/signup';</script>")
     return render(request, "registration/Signup.html", {"fact": fact})
-
-
-
 def UsernameCheck(request):
     if request.method == "GET":
         username = request.GET.get("username")
@@ -166,7 +177,7 @@ def AnonymousDirectLogin(request):
 
             user = User.objects.create_user(username=username, email=email, password=password)
             user_type.objects.create(user=user, type="Anonymous")
-            UserProfile.objects.create(email=email, name=username, username=username)
+            UserProfile.objects.create(user=user, name=username, username=username)
 
             user = authenticate(username=username, password=password)
             login(request, user)
@@ -178,3 +189,6 @@ def AnonymousDirectLogin(request):
                 }
             )
     return render(request, "registration/AnonymousDirectLogin.html")
+
+def Base(request):
+    return render(request, "registration/iframe_base.html")

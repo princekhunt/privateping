@@ -7,7 +7,7 @@ def getFriendsList(id):
         friends = Friends.objects.filter(user=user)
         friend_list = []
         for i in friends:
-            friend_list.append(i.friend)
+            friend_list.append(i)
         return friend_list
     except:
         return []
