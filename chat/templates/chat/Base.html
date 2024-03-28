@@ -129,7 +129,7 @@
         <div class="friends" style="overflow-y: auto">
             <ul class="list-group">
                 {% for friend in friends %}
-                <a href="http://{{ request.get_host }}/waiting-room?user={{friend.friend.username}}">
+                <a href="{% url 'chat:waiting-room' %}?user={{friend.friend.username}}">
                     {% if friend.accepted == True %}
                         <li class="list-group-item list-group-item-action">
                     {% else %}
