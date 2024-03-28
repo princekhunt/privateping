@@ -3,7 +3,7 @@
   <h1>PrivatePing - A Secure Messaging Application</h1>
 </div>
 
-[![Website Status](https://img.shields.io/website?url=https%3A%2F%2Fprivateping.plutoweb.live)](https://privateping.plutoweb.live)
+[![Website Status](https://img.shields.io/website?url=https%3A%2F%2Fprivateping.bytespot.tech)](https://privateping.bytespot.tech)
 [![first-timers](https://img.shields.io/badge/first--timers--friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

@@ -9,7 +9,7 @@ Developers: Prince Khunt [https://www.linkedin.com/in/princekhunt/], Viraj Bhing
 Contributors: Prince Khunt, Viraj Bhingradiya, and You?
 
 /* SITE */
-- Website: https://privateping.plutoweb.live
+- Website: https://privateping.bytespot.tech
 - GitHub: https://github.com/princekhunt/privateping
 - License: MIT License
 
