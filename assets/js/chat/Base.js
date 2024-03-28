@@ -149,4 +149,15 @@ $(document).ready(function() {
     })
 });
 
+//limit note length
+$(document).ready(function() {
+    $('#note').on('keyup', function(){
+        var note = $('#note').val();
+        if(note.length > 100){
+            $('#note').val(note.substring(0, 100));
+        }
+    })
+});
+
+
 parent.document.title = "PrivatePing - A Secure Chat Room";

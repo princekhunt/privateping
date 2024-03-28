@@ -8,7 +8,7 @@ class AllowDesktopOnlyMiddleware:
     def __call__(self, request):
 
         if request.user_agent.is_mobile or request.user_agent.is_tablet:
-            allows = ["/", "/robots.txt", "/humans.txt", "/favicon.ico"]
+            allows = ["/", "/home", "/robots.txt", "/humans.txt", "/favicon.ico"]
             if not request.path in allows:
                 return HttpResponseForbidden("<h2 style='margin-top:50%; text-align:center;'>Sorry, PrivatePing works only on desktop. Please use a desktop to get the best experience!</h2>")
             else:
@@ -26,5 +26,6 @@ class FrameOptionsMiddleware:
         response["X-Frame-Options"] = "ALLOW-FROM " + DOMAIN
         response["Content-Security-Policy"] = "frame-ancestors " + DOMAIN
         response["X-Content-Security-Policy"] = "frame-ancestors " + DOMAIN
-        response["Referrer-Policy"] = "no-referrer"
+        response["Referrer-Policy"] = "same-origin"
+        
         return response

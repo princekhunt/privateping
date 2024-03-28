@@ -92,7 +92,10 @@
                             <small>Please enter exact username (Case-sensitive)</small>
                             <br />
                             <input class="add-user-input" type="text" placeholder="Enter username" name="friend" id="finduser"
-                                 autocomplete="off" /><br /><br />
+                                 autocomplete="off" /><br /><br /><br>
+                            <small><b>Note:</b></small><br>
+                            <textarea type="text" name="note" id="note" placeholder="Optional" autocomplete="off" ></textarea><br /><br />
+                            <small>A note will be sent along with the friend request.</small><br>
                             <button type="submit" id="adduserbutton" class="btn btn-outline-primary">
                                 <i class="fa fa-plus"></i> Add
                             </button>
@@ -126,17 +129,21 @@
         <div class="friends" style="overflow-y: auto">
             <ul class="list-group">
                 {% for friend in friends %}
-                <a href="http://{{ request.get_host }}/waiting-room?user={{friend.username}}">
-                    <li class="list-group-item list-group-item-action">
+                <a href="http://{{ request.get_host }}/waiting-room?user={{friend.friend.username}}">
+                    {% if friend.accepted == True %}
+                        <li class="list-group-item list-group-item-action">
+                    {% else %}
+                        <li style="opacity: 0.5;" class="list-group-item list-group-item-action">
+                    {% endif %}
                         <div class="row">
                             <div class="col">
                                 <img style="border-radius: 50%"
-                                    src="https://ui-avatars.com/api/?background=random&color=fff&name={{friend.name}}"
+                                    src="https://ui-avatars.com/api/?background=random&color=fff&name={{friend.friend.name}}"
                                     style="width: 50px; height: 50px" />
                             </div>
                             <div class="col">
                                 <div class="row">
-                                    <p>{{friend.name}}</p>
+                                    <p>{{friend.friend.name}}</p>
                                 </div>
                             </div>
                         </div>
@@ -210,7 +217,7 @@
             event.preventDefault();
             var username = $("#finduser").val();
 
-            window.location.href = "/addfriend/" + escapeHtml(username);
+            window.location.href = "/addfriend/" + escapeHtml(username) + "?note="+escapeHtml($("#note").val());
         });
     </script>
 
@@ -363,6 +370,7 @@
 
             //get the public key from cookie
             var public_key = getCookie("public_key");
+            console.log(public_key);
 
             //base64 utf-8 decode
             public_key = decodeURIComponent(escape(window.atob(public_key)));

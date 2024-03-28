@@ -164,4 +164,10 @@ window.addEventListener("load", function () {
   $("#Maincontent").delay(500).fadeIn();
 });
 
+//goback
+function goback(){
+  window.history.back();
+
+}
+
 parent.document.title = "PrivatePing - Signup";

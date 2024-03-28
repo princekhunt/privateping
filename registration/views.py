@@ -54,7 +54,7 @@ def GenerateKeys(request):
         return redirect('registration:login')
 
     if request.method == "POST":
-        user = UserProfile.objects.get(email=request.user.email)
+        user = UserProfile.objects.get(user=request.user)
         public_key = request.POST.get("public_key")
         if Keys.objects.filter(user=user).exists():
             key = Keys.objects.get(user=user)
@@ -72,7 +72,7 @@ def Logout(request):
         return redirect('registration:login')
         
     if request.user.is_authenticated:
-        user_profile = UserProfile.objects.get(email=request.user.email)
+        user_profile = UserProfile.objects.get(user=request.user)
         user_profile.online = 0
         user_profile.online_for = None
         if UserProfile.objects.filter(online_for=user_profile).exists():
@@ -128,7 +128,7 @@ def Signup(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get("password1")
             user = form.save()
-            profile = UserProfile(email=email, name=name, username=username)
+            profile = UserProfile(user=user, name=name, username=username)
             profile.save()
             user_type_obj = user_type(user=user, type="regular")
             user_type_obj.save()
@@ -177,7 +177,7 @@ def AnonymousDirectLogin(request):
 
             user = User.objects.create_user(username=username, email=email, password=password)
             user_type.objects.create(user=user, type="Anonymous")
-            UserProfile.objects.create(email=email, name=username, username=username)
+            UserProfile.objects.create(user=user, name=username, username=username)
 
             user = authenticate(username=username, password=password)
             login(request, user)
