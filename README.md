@@ -23,7 +23,7 @@ PrivatePing is a secure messaging application built on Python's Django framework
 PrivatePing is hosted on Heroku. It is accessible through a web browser. Users can register, log in securely, and exchange encrypted messages with each other without the need to install or run the application locally.
 
 To get started:
-1. Visit [PrivatePing](https://privateping.plutoweb.live) in your web browser.
+1. Visit [PrivatePing](https://privateping.bytespot.tech) in your web browser.
 2. You can either:
    - Sign up for a standard account using your email address, and Login using your credentials to continue.
    - Alternatively, use the option for anonymous direct login, which creates a temporary account for you valid for the next 24 hours. No private information will be attached to this account.
