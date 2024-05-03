@@ -146,7 +146,6 @@ def FriendRequest(request):
             return redirect("chat:dashboard")
         
     if request.method == "POST":
-        print(request.POST)
         request_from = request.POST.get("request_from")
         #validations
         if Friends.objects.filter(user=UserProfile.objects.get(user=request.user), friend=UserProfile.objects.get(user=User.objects.get(username=request_from))).exists():
@@ -163,3 +162,19 @@ def FriendRequest(request):
                 return redirect("chat:dashboard")
 
     return render(request, "chat/FriendRequest.html")
+
+def deleteFriend(request):
+    if not request.user.is_authenticated:
+        return redirect("registration:login")
+    
+    if request.method == "GET":
+        friend = request.GET.get("friend")
+        try:
+            if Friends.objects.filter(user=UserProfile.objects.get(user=request.user), friend=UserProfile.objects.get(user=User.objects.get(username=friend))).exists():
+                friend = UserProfile.objects.get(user=User.objects.get(username=friend))
+                Friends.objects.filter(user=UserProfile.objects.get(user=request.user), friend=friend).delete()
+                Friends.objects.filter(user=friend, friend=UserProfile.objects.get(user=request.user)).delete()
+                return JsonResponse({"status": True, "message": "Friend deleted successfully!"})
+        except ObjectDoesNotExist:
+            return redirect("chat:dashboard")
+    return redirect("chat:dashboard")

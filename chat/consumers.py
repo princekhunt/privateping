@@ -88,14 +88,16 @@ class ChatConsumer(WebsocketConsumer):
 
         try:
             message = text_data_json['message']
-
             to = text_data_json['to']
+            destroy = text_data_json['destroy']
+            
 
             async_to_sync(self.channel_layer.group_send)(
                 "box_"+str(to),
                 {
                     'type': 'chat_message',
-                    'message': message
+                    'message': message,
+                    'destroy': destroy
                 }
             )   
 
@@ -119,11 +121,12 @@ class ChatConsumer(WebsocketConsumer):
             pass
 
     def chat_message(self, event):
+        print(event['destroy'])
         try:
-            message = event['message']
             self.send(text_data=json.dumps({
-                'message': message,
-                'status': "received"
+                'message': event['message'],
+                'status': "received",
+                'destroy': event['destroy']
             }))
         except:
             pass

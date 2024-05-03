@@ -79,3 +79,9 @@
   border: none; 
   background-color: transparent;
 }
+
+#delete-friend{
+  padding: 1.8rem 0rem 0rem 0rem;
+  color: rgb(255, 91, 91);
+  cursor: pointer;
+}

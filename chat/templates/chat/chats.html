@@ -25,6 +25,18 @@
             <div class="input-group-prepend">
                 <input style="border-radius: 15px;" type="text" placeholder=" Enter your message" name="message"
                     id="msg_field" autocomplete="off"> &nbsp; &nbsp;
+                    <label class="select" for="MessageDestroy">
+                        <select id="MessageDestroy" required="required">
+                          <option value="0" selected="selected">Do not destroy</option>
+                          <option value="5">5 seconds</option>
+                          <option value="10">10 seconds</option>
+                          <option value="30">30 seconds</option>
+                          <option value="60">1 minutes</option>
+                          <option value="300">5 minutes</option>
+                          <option value="600">10 minutes</option>
+                          <option value="3600">1 hour</option>
+                        </select>
+                      </label>&nbsp; &nbsp;
                 <button style="border-radius: 50%;" type="submit" name="send" class="btn btn-primary" id="send_btn"> <i
                         class="fa-solid fa-paper-plane"></i></button>
 

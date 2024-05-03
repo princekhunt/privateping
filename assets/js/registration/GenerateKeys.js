@@ -63,4 +63,6 @@ async function main() {
 
 main();
 
-parent.document.title = "PrivatePing - Securing Session";
+if (typeof parent !== 'undefined' && parent.document) {
+  parent.document.title = "PrivatePing - Securing Session";
+}

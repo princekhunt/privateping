@@ -21,8 +21,15 @@ socket3.addEventListener('message', function (e) {
     const data = JSON.parse(e.data);
     if (data.status == 'offline') {
         if (count >= 3) {
-            alert("User disconnected. Navigating you to the home page.");
-            parent.location.href = "/";
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                confirmButtonColor: "#003d89",
+                text: "User disconnected, Navigating you to home page!",
+              }).then(function(){
+                parent.location.href = "/";
+              
+              });
         }
         else {
             count++;
@@ -50,7 +57,12 @@ document.getElementById("msg_field").addEventListener("input", function(){
     }
 });
 
-alert("Please wait, User is connecting...");
+Swal.fire({
+    title: "Creating a secure room!",
+    text: "Please wait while we connect you.",
+    confirmButtonColor: "#003d89",
+    icon: "info"
+  });
 document.getElementById("msg_field").disabled = true;
 document.getElementById("send_btn").disabled = true;
 

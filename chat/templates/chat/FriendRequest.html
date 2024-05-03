@@ -36,8 +36,13 @@
 
             },
             success: function (data) {
-                alert("Friend request accepted");
-                window.location.href = "{% url 'chat:dashboard' %}";
+                Swal.fire({
+                title: "Friend request accepted!",
+                confirmButtonColor: "#003d89",
+                icon: "success"
+                }).then(function(){
+                    window.location.href = "{% url 'chat:dashboard' %}";
+                })
             }
         });
     });
@@ -53,8 +58,13 @@
 
             },
             success: function (data) {
-                alert("Friend request rejected");
-                window.location.href = "{% url 'chat:dashboard' %}";
+                Swal.fire({
+                title: "Friend request rejected!",
+                confirmButtonColor: "#003d89",
+                icon: "success"
+                }).then(function(){
+                    window.location.href = "{% url 'chat:dashboard' %}";
+                });
             }
         });
     });

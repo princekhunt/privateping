@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
     <link rel="stylesheet" href="{% static 'css/base_style.css' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.min.css" integrity="sha256-h2Gkn+H33lnKlQTNntQyLXMWq7/9XI2rlPCsLsVcUBs=" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -28,6 +29,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.all.min.js" integrity="sha256-73rO2g7JSErG8isZXCse39Kf5yGuePgjyvot/8cRCNQ=" crossorigin="anonymous"></script>
+
+    
 
     <!--define favicon for all devices-->
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicons/apple-touch-icon.png' %}" />
@@ -69,7 +73,7 @@
                     Please share your username: <br /><b><u>{{request.user}}</u></b><br />with the person you wish to
                     chat with.
                     <br><br><br>
-                    <small>Note: This temporary account will be logged out automatically in 24 hours, and deleted.</small>
+                    <small>Note: This temporary account will be logged out automatically in <b>24 hours, and deleted.</b></small>
                 </div>
             </div>
         </div>
@@ -144,6 +148,7 @@
                             <div class="col">
                                 <div class="row">
                                     <p>{{friend.friend.name}}</p>
+                                       <a id="delete-friend" onclick="delete_friend('{{friend.friend.name}}');"><i class="fas fa-trash"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -201,14 +206,31 @@
         } else {
         }
 
-        function logout() {
-            confimation = confirm(
-                "Your temporary account will be deleted on logging out, are you sure?"
-            );
-            if (confimation) {
-                window.location.href = "/logout";
-            }
+
+        function logout(){
+            Swal.fire({
+                title: "Heads up!",
+                text: "Your temporary account will be deleted on logging out, are you sure?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#003d89",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                    title: "Deleted!",
+                    confirmButtonColor: "#003d89",
+                    text: "Your account has been deleted.",
+                    icon: "success"
+                    });
+                    setTimeout(function () {
+                    window.location.href = "/logout";
+                    }, 2000);
+                }
+                });
         }
+
     </script>
     {% endif %}
 
@@ -249,7 +271,12 @@
             if(window.location.href.includes("/chat")){
                 if(flowOpen == false){
                     flowOpen = true;
-                    alert("You can now send messages.");
+                    Swal.fire({
+                        title: "You're good to go!",
+                        text: "You can now send messages securely.",
+                        confirmButtonColor: "#003d89",
+                        icon: "success"
+                        });
                     document.getElementById("msg_field").disabled = false;
                     document.getElementById("send_btn").disabled = false;
                     document.getElementById("live-notification-text").innerHTML = "Online";
@@ -304,6 +331,8 @@
                 const decrypted = decoder.decode(decrypted_message);
                 message = decrypted;
 
+                destroy = obj.destroy;
+
                 const outputDiv = document.getElementById("output");
                 var lenth = message.length;
                 var width = 0;
@@ -331,8 +360,15 @@
                 } else {
                     width = 90;
                 }
+
+                classname = Math.random().toString(36).substring(7);
+            DestroySeconds = new Array(5, 10, 30, 60, 300, 600, 3600);
+            if(DestroySeconds.includes(parseInt(destroy))){
+                destroyer(parseInt(destroy), classname);
+            }
+
                 const text_box =
-                    '<div id="ChatMessage" class="container" style="max-width: ' +
+                    '<div id="ChatMessage" class="container '+ classname +'" style="max-width: ' +
                     width +
                     '%;">' +
                     "<h5>" +
@@ -389,6 +425,8 @@
                 return btoa(binary);
             }
 
+            MessageDestroy = $("#MessageDestroy").val();
+
             encryptData(message, public_key).then((encrypted_message) => {
                 //convert to base64
                 const base64 = arrayBufferToBase64(encrypted_message);
@@ -396,10 +434,10 @@
                     JSON.stringify({
                         message: base64,
                         to: getUserName(),
+                        destroy: MessageDestroy,
                     })
                 );
             });
-
             // Clear the input field
             $("#msg_field").val("");
             
@@ -430,8 +468,15 @@
                 width = 100;
             }
 
+            classname = Math.random().toString(36).substring(7);
+            DestroySeconds = new Array(5, 10, 30, 60, 300, 600, 3600);
+            if(DestroySeconds.includes(parseInt(MessageDestroy))){
+                destroyer(parseInt(MessageDestroy), classname);
+            }
+
+
             const text_box =
-                '<div id="ChatMessage" class="container-darker" style="max-width: ' +
+                '<div id="ChatMessage" class="container-darker '+ classname +' " style="max-width: ' +
                 width +
                 '%;">' +
                 "<h5>" +

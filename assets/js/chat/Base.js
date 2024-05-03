@@ -159,5 +159,62 @@ $(document).ready(function() {
     })
 });
 
+function destroyer(delay, element){
+setTimeout(() => {
+    //element is class name
+    var Message = document.getElementsByClassName(element);
+    Message = Message[0];
+    Message.remove();
+    
+}, delay * 1000);
+}
+
+function delete_friend(friend){
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You want to remove this user from your friend list. This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '../delete_friend',
+                dataType: 'json',
+                data: { 
+                    'friend': friend 
+                },
+                success: function(response){
+                    if(response.status == true){
+                        Swal.fire(
+                            'Deleted!',
+                            'User has been deleted.',
+                            'success'
+                          ).then(function(){
+                            location.reload();
+                          });
+                    }
+                    else{
+                        Swal.fire(
+                            'Error!',
+                            'An error occured. Please try again later.',
+                            'error'
+                          );
+                    }
+                },
+                error: function(response){
+                    Swal.fire(
+                        'Error!',
+                        'An error occured. Please try again later.',
+                        'error'
+                      );
+                }
+            });
+        
+        }
+      });
+    }
 
 parent.document.title = "PrivatePing - A Secure Chat Room";
