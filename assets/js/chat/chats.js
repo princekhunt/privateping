@@ -1,8 +1,8 @@
-const socketProtocol3 = (window.location.protocol === 'https:') ? 'wss' : 'ws';
+const socketProtocol_3 = (window.location.protocol === 'https:') ? 'wss' : 'ws';
 
-const socket3 = new WebSocket(socketProtocol3 + "://" + window.location.host + '/ws/chat');
-socket3.onopen = function (e) {
-    socket3.send(JSON.stringify({
+const socket_3 = new WebSocket(socketProtocol_3 + "://" + window.location.host + '/ws/chat/status/');
+socket_3.onopen = function (e) {
+    socket_3.send(JSON.stringify({
         'check': 'livestatus',
         'for': getUserName(),
     }));
@@ -10,14 +10,14 @@ socket3.onopen = function (e) {
 
 //keep checking if user is online
 setInterval(function () {
-    socket3.send(JSON.stringify({
+    socket_3.send(JSON.stringify({
         'check': 'livestatus',
         'for': getUserName(),
     }));
 }, 3000);
 
 var count = 0;
-socket3.addEventListener('message', function (e) {
+socket_3.addEventListener('message', function (e) {
     const data = JSON.parse(e.data);
     if (data.status == 'offline') {
         if (count >= 3) {
@@ -28,7 +28,7 @@ socket3.addEventListener('message', function (e) {
                 text: "User disconnected, Navigating you to home page!",
               }).then(function(){
                 parent.location.href = "/";
-              
+
               });
         }
         else {

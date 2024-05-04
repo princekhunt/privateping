@@ -247,26 +247,35 @@
         //WebSockets Script start
         flowOpen = false;
 
-        const socketProtocol =
+        const socketProtocol_1 =
             window.location.protocol === "https:" ? "wss" : "ws";
 
-        const socket = new WebSocket(
-            socketProtocol + "://" + window.location.host + "/ws/chat"
+        const socket_1 = new WebSocket(
+            socketProtocol_1 + "://" + window.location.host + "/ws/chat/"
         );
 
         // Connection opened
-        socket.addEventListener("open", (event) => {
-            send_status = {
-                status: "online",
-                for: getUserName(),
+        socket_1.addEventListener("open", (event) => {
+            send_status_1 = {
+                message: "ping",
+                to: getUserName(),
+                destroy: 0,
             };
-            send_status = JSON.stringify(send_status);
-            socket.send(send_status);
+            send_status_1 = JSON.stringify(send_status_1);
+            //send ping 3 times for 3 seconds
+            var PingCounter = 0;
+            var PingInterval = setInterval(function () {
+                socket_1.send(send_status_1);
+                PingCounter++;
+                if (PingCounter == 3) {
+                    clearInterval(PingInterval);
+                }
+            }, 1000);
         });
 
         // Listen for messages
         var loaderstatus = 0;
-        socket.addEventListener("message", (event) => {
+        socket_1.addEventListener("message", (event) => {
             
             if(window.location.href.includes("/chat")){
                 if(flowOpen == false){
@@ -284,30 +293,13 @@
             }
             }
 
-
-
             //get only message from event.data
-            const obj = JSON.parse(event.data);
-            //check if already there is a loader, then don't append
-            if (obj.status == "typing") {
-                if (loaderstatus == 0) {
-                    if (document.getElementById("fromloader") == null) {
-                        var loader =
-                            '<div id="fromloader" class="container" style="max-width: 30%;"><h5><span class="messageloader"></span></h5></div>';
-                        $("#board").append(loader);
-                        scrolltoend();
-                        loaderstatus = 1;
-                    }
-                }
-            }
-            if (obj.status == "online") {
-                //somehow, calling one time is removing the loader.
+            const obj_1 = JSON.parse(event.data);
 
-                document.getElementById("fromloader").remove();
-
-                loaderstatus = 0;
+            var message_1 = obj_1.message;
+            if (message_1 == "pong") {
+                return;
             }
-            var message = obj.message;
 
             //base64 to array buffer
             function base64ToArrayBuffer(base64) {
@@ -320,7 +312,7 @@
                 return bytes.buffer;
             }
             //convert to array buffer
-            const arrayBuffer = base64ToArrayBuffer(message);
+            const arrayBuffer = base64ToArrayBuffer(message_1);
 
             //get the private key from local storage
             const privateKey = JSON.parse(localStorage.getItem("privateKey"));
@@ -331,12 +323,11 @@
                 const decrypted = decoder.decode(decrypted_message);
                 message = decrypted;
 
-                destroy = obj.destroy;
+                destroy = obj_1.destroy;
 
                 const outputDiv = document.getElementById("output");
                 var lenth = message.length;
                 var width = 0;
-                console.log(lenth)
                 if (lenth < 10) {
                     width = 10;
                 } else if (lenth >= 10 && lenth <= 20) {
@@ -383,12 +374,12 @@
             });
         });
         // Connection closed
-        socket.addEventListener("close", (event) => {
+        socket_1.addEventListener("close", (event) => {
 
         });
 
         // Connection error
-        socket.addEventListener("error", (event) => {
+        socket_1.addEventListener("error", (event) => {
         });
 
         // Function to send a message
@@ -406,7 +397,6 @@
 
             //get the public key from cookie
             var public_key = getCookie("public_key");
-            console.log(public_key);
 
             //base64 utf-8 decode
             public_key = decodeURIComponent(escape(window.atob(public_key)));
@@ -430,7 +420,7 @@
             encryptData(message, public_key).then((encrypted_message) => {
                 //convert to base64
                 const base64 = arrayBufferToBase64(encrypted_message);
-                socket.send(
+                socket_1.send(
                     JSON.stringify({
                         message: base64,
                         to: getUserName(),
@@ -493,78 +483,173 @@
                 '<i class="fa fa-paper-plane" aria-hidden="true"></i>'
             );
         });
-        
-        var TypingStatusSend = false;
-        $("#msg_field").on("keypress", function () {
-            var send_status2 = {
-                status: "typing",
-                for: getUserName(),
-            };
-            if(TypingStatusSend == false){
-                send_status2 = JSON.stringify(send_status2);
-                TypingStatusSend = true;
-                socket.send(send_status2);
-                OnlineStatusSend = false;
-            }
 
-        });
-
-        //check if message field looses focus, then send status not typing
-        var OnlineStatusSend = false;
-        $("#msg_field").on("focusout", function () {
-            var send_status2 = {
-                status: "online",
-                for: getUserName(),
-            };
-            if(OnlineStatusSend == false){
-                send_status2 = JSON.stringify(send_status2);
-                socket.send(send_status2);
-                OnlineStatusSend = true;
-                loaderstatus = 0;
-                TypingStatusSend = false;
-            }
-        });
-            
-        
-
-        //check if message field is empty, then send status not typing
-        var OnlineStatusSend = false;
-        $("#msg_field").on("input", function () {
-            if ($("#msg_field").val() == "") {
-                var send_status2 = {
-                    status: "online",
-                    for: getUserName(),
-                };
-                if(OnlineStatusSend == false){
-                    send_status2 = JSON.stringify(send_status2);
-                    socket.send(send_status2);
-                    loaderstatus = 0;
-                    TypingStatusSend = false;
-                    OnlineStatusSend = true;
-                }
-            }
-        });
-
-        //on press enter and press send button send the not typing status
-        var OnlineStatusSend = false;
-        $("#msg_field").on("keypress", function (e) {
-            if (e.which == 13) {
-                var send_status2 = {
-                    status: "online",
-                    for: getUserName(),
-                };
-                if(OnlineStatusSend == false){
-                    send_status2 = JSON.stringify(send_status2);
-                    socket.send(send_status2);
-                    loaderstatus = 0;
-                    TypingStatusSend = false;
-                    OnlineStatusSend = true;
-                }
-            }
-        });
 
         // Websocket script end
     </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+
+const socketProtocol_2 =
+    window.location.protocol === "https:" ? "wss" : "ws";
+
+const socket_2 = new WebSocket(
+    socketProtocol_2 + "://" + window.location.host + "/ws/chat/currentstatus/"
+);
+
+// Connection opened
+socket_2.addEventListener("open", (event_2) => {
+    send_status_2 = {
+        status: "online",
+        for: getUserName(),
+    };
+    send_status_2 = JSON.stringify(send_status_2);
+    socket_2.send(send_status_2);
+});
+
+// Listen for messages
+var loaderstatus = 0;
+socket_2.addEventListener("message", (event_2) => {
+
+    //get only message from event.data
+    const obj_2 = JSON.parse(event_2.data);
+    //check if already there is a loader, then don't append
+    if (obj_2.status == "typing") {
+        if (loaderstatus == 0) {
+            if (document.getElementById("fromloader") == null) {
+                var loader =
+                    '<div id="fromloader" class="container" style="max-width: 30%;"><h5><span class="messageloader"></span></h5></div>';
+                $("#board").append(loader);
+                scrolltoend();
+                loaderstatus = 1;
+            }
+        }
+    }
+    if (obj_2.status == "online") {
+        //somehow, calling one time is removing the loader.
+
+        document.getElementById("fromloader").remove();
+
+        loaderstatus = 0;
+    }
+
+   
+    });
+// Connection closed
+socket_2.addEventListener("close", (event) => {
+
+});
+
+// Connection error
+socket_2.addEventListener("error", (event) => {
+});
+
+// Function to send a message
+
+var TypingStatusSend = false;
+$("#msg_field").on("keypress", function () {
+    var send_status_2 = {
+        status: "typing",
+        for: getUserName(),
+    };
+    if(TypingStatusSend == false){
+        send_status_2 = JSON.stringify(send_status_2);
+        TypingStatusSend = true;
+        socket_2.send(send_status_2);
+        OnlineStatusSend = false;
+    }
+
+});
+
+//check if message field looses focus, then send status not typing
+var OnlineStatusSend = false;
+$("#msg_field").on("focusout", function () {
+    var send_status_2 = {
+        status: "online",
+        for: getUserName(),
+    };
+    if(OnlineStatusSend == false){
+        send_status_2 = JSON.stringify(send_status_2);
+        socket_2.send(send_status2);
+        OnlineStatusSend = true;
+        loaderstatus = 0;
+        TypingStatusSend = false;
+    }
+});
+    
+
+
+//check if message field is empty, then send status not typing
+var OnlineStatusSend = false;
+$("#msg_field").on("input", function () {
+    if ($("#msg_field").val() == "") {
+        var send_status_2 = {
+            status: "online",
+            for: getUserName(),
+        };
+        if(OnlineStatusSend == false){
+            send_status_2 = JSON.stringify(send_status_2);
+            socket_2.send(send_status_2);
+            loaderstatus = 0;
+            TypingStatusSend = false;
+            OnlineStatusSend = true;
+        }
+    }
+});
+
+//on press enter and press send button send the not typing status
+var OnlineStatusSend = false;
+$("#msg_field").on("keypress", function (e) {
+    if (e.which == 13) {
+        var send_status_2 = {
+            status: "online",
+            for: getUserName(),
+        };
+        if(OnlineStatusSend == false){
+            send_status_2 = JSON.stringify(send_status_2);
+            socket_2.send(send_status_2);
+            loaderstatus = 0;
+            TypingStatusSend = false;
+            OnlineStatusSend = true;
+        }
+    }
+});
+
+// Websocket script end
+    </script>
+
 </body>
 
 </html>

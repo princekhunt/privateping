@@ -188,20 +188,22 @@ function delete_friend(friend){
                 },
                 success: function(response){
                     if(response.status == true){
-                        Swal.fire(
-                            'Deleted!',
-                            'User has been deleted.',
-                            'success'
-                          ).then(function(){
-                            location.reload();
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'User has been deleted.',
+                            confirmButtonColor: '#3085d6',
+                            icon: 'success',
+                          }).then(function(){
+                            parent.location.href = '/';
                           });
                     }
                     else{
-                        Swal.fire(
-                            'Error!',
-                            'An error occured. Please try again later.',
-                            'error'
-                          );
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occured. Please try again later.',
+                            confirmButtonColor: '#3085d6',
+                            icon: 'error',
+                    });
                     }
                 },
                 error: function(response){
