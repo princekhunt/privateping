@@ -107,7 +107,7 @@ If you prefer not to use the provided installation script or encounter any issue
 
 ## Contributors
 
-We extend our heartfelt gratitude to all contributors who have helped improve PrivatePing! Your efforts are greatly appreciated. See the [humans.txt](https://privateping.plutoweb.live/humans.txt) page for a list of contributors.
+We extend our heartfelt gratitude to all contributors who have helped improve PrivatePing! Your efforts are greatly appreciated. See the [humans.txt](https://privateping.bytespot.tech/humans.txt) page for a list of contributors.
 
 Contributions are welcome! If you'd like to contribute to PrivatePing, please follow these guidelines:
 
