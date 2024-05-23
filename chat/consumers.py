@@ -158,3 +158,60 @@ class ChatConsumerCurrentStatus(WebsocketConsumer):
 
     def disconnect(self, code):
         self.close()
+
+
+class ChatConsumerNotify(WebsocketConsumer):
+    """
+    Description: This consumer is used to notify the user, if anyone is in waiting room, waiting for the user to come online.
+    A user will receive a message with status 'notify' along with the username ('from') of friend who sent the message.
+    """
+    http_user_and_session = True
+    def connect(self):
+        user = self.scope["user"]
+        self.room_name = "box4_"+str(user)
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_name,
+            self.channel_name
+        )
+        self.accept()
+
+    def receive(self, text_data=None, bytes_data=None):
+        text_data_json = json.loads(text_data)
+
+        if text_data_json['available']=="ping":
+            user = self.scope["user"]
+            if UserProfile.objects.filter(online=1).filter(online_for=UserProfile.objects.get(username=user)).exclude(username=user).exists():
+                all = UserProfile.objects.filter(online=1).filter(online_for=UserProfile.objects.get(username=user)).exclude(username=user)
+                avl_users = []
+                for i in all:
+                    avl_users.append(i.username)
+                if len(avl_users)>0:
+                    avl_users = json.dumps(avl_users)
+                    async_to_sync(self.channel_layer.group_send)(
+                        "box4_"+str(user),
+                        {
+                            'type': 'NotifyUser',
+                            'status': 'notify',
+                            'from': avl_users
+                        }
+                    )
+                else:
+                    self.send(text_data=json.dumps({
+                        'status': 'no',
+                        'from': 'NULL'
+                    }))
+            else:
+                self.send(text_data=json.dumps({
+                    'status': 'no',
+                    'from': 'NULL'
+                }))
+    def NotifyUser(self, event):
+        status = event['status']
+        from_user = event['from']
+        self.send(text_data=json.dumps({
+            'status': status,
+            'from': from_user
+        }))
+
+    def disconnect(self, code):
+        self.close()

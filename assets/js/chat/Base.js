@@ -125,11 +125,8 @@ $(document).ready(function() {
             },
             success: function(response){
                 if(response.status == "ok"){
-                    console.log("ok1");
                     if(!response.available){
-                        console.log("ok2")
                         if(!response.self){
-                            console.log("ok3")
                         $('#finduser').css('border', '2px solid green');
                         $('#adduserbutton').prop('disabled', false);
                         }
@@ -218,5 +215,117 @@ function delete_friend(friend){
         }
       });
     }
+
+// This socket is to notify a user, if another user is waiting.
+const socketProtocol_4 = (window.location.protocol === "https:") ? "wss" : "ws";
+const socket_4 = new WebSocket(socketProtocol_4 + "://" + window.location.host + '/ws/notify/');
+
+socket_4.onopen = function (e) {
+    socket_4.send(JSON.stringify({
+        'available': 'ping'
+    }));
+};
+
+IgnoreList = new Array(); // List of users to ignore
+Notified = new Array(); // List of users who are already notified
+LoaderNotifying = new Array(); // List of users who are already showing loader
+
+socket_4.addEventListener('message', function (e) {
+    const data = JSON.parse(e.data);
+    if (data.status == 'notify') { //if status is notify, it means, someone is waiting
+        users = JSON.parse(data.from);
+        
+        //if current page is chat page, then remove the current user from the list
+        if(window.location.href.indexOf("chat") > -1){
+            users = users.filter(function(value, index, arr){
+                return value != getUserName();
+            });
+        }
+
+        // if there is a loader, but user is no longer online, then remove the loader
+        for (var i = 0; i < LoaderNotifying.length; i++) {
+            user = LoaderNotifying[i];
+            if(!users.includes(user)){
+                $('#live_notification_'+user).empty();
+                LoaderNotifying.splice(i, 1);
+            }
+        }
+
+        // Show loader and toast notification
+        for(var i=0; i < users.length; i++){    
+            CurrentUser = users[i]
+            if(IgnoreList.includes(CurrentUser)){ // If user is in ignore list, then do not show toast notification
+                 if(!LoaderNotifying.includes(CurrentUser)){
+                    // show loader
+                     $('#live_notification_'+CurrentUser).append("<img src='/static/images/wait.gif' style='width: 30px; height: 30px' /><small style='font-size:50%;' >Waiting!</small>");
+                     LoaderNotifying.push(CurrentUser);
+                 }
+                continue;
+            }
+
+            // if user is not yet notified, then show loader
+            if(!Notified.includes(CurrentUser)){
+                $('#live_notification_'+CurrentUser).append("<img src='/static/images/wait.gif' style='width: 30px; height: 30px' /><small style='font-size:50%;' ><b>Waiting!</b></small>");
+                LoaderNotifying.push(CurrentUser);
+            }
+
+            // Notify a user (toast notification)
+            Notified.push(CurrentUser);
+            //play sound
+            var audio = new Audio('/static/media/notification.mp3');
+            audio.play();
+            Swal.fire({
+                title: "A Secure Chat Room",
+                text: CurrentUser + " is waiting for you in the waiting room!",
+                icon: "warning",
+                position: "top-end",
+                confirmButtonText: 'Join Now',
+                denyButtonText: 'Ignore!',
+                toast: true,
+                showDenyButton: true,
+                confirmButtonColor: "#003d89",
+                timer: 3000,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/waiting-room?user=" + CurrentUser;
+                    //remove the user from the list
+                    users.splice(users.indexOf(CurrentUser), 1);
+
+                }
+                else if (result.isDenied) {
+                    IgnoreList.push(CurrentUser); //add user to ignore list
+                    //show toast message that user is ignored
+                    Swal.fire({
+                        title: "User Ignored",
+                        text: "You will not be notified again for this user for a while!",
+                        icon: "info",
+                        position: "top-end",
+                        toast: true,
+                        showConfirmButton: false,
+                        timer: 4000,
+                    });
+                    
+                }
+            }
+            );
+            
+        };
+    }
+    else{
+        //No users are waiting
+       //if any loader active and no user is waiting, then remove the loader
+         for (var i = 0; i < LoaderNotifying.length; i++) {
+                user = LoaderNotifying[i];
+                $('#live_notification_'+user).empty();
+                LoaderNotifying.splice(i, 1);
+          }
+    }
+});
+
+setInterval(function () {
+    socket_4.send(JSON.stringify({
+        'available': 'ping',
+    }));
+}, 3000);
 
 parent.document.title = "PrivatePing - A Secure Chat Room";
