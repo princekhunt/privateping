@@ -1,0 +1,148 @@
+body,
+html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  font-family: "Nunito", sans-serif;
+}
+
+#login-container {
+  text-align: center;
+}
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-container {
+  position: relative;
+  overflow: hidden; /* Ensures the overflow is hidden for animation */
+}
+
+.input-field {
+  width: 250px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  transition: transform 0.5s ease; /* Define the transition property */
+}
+
+.login-button {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 0 5px 5px 0;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}
+
+.login-button:active {
+  background-color: #004080;
+}
+#password-field {
+  display: none;
+}
+
+#password-field.active {
+  display: block;
+}
+
+#password-button {
+  display: none;
+}
+
+#password-button.active {
+  display: block;
+}
+
+.DirectLoginLoader {
+  animation: rotate 1s infinite;
+  height: 100px; /* Increased height */
+  width: 100px; /* Increased width */
+}
+
+.DirectLoginLoader:before,
+.DirectLoginLoader:after {
+  border-radius: 50%;
+  content: "";
+  display: block;
+  height: 40px; /* Increased height */
+  width: 40px; /* Increased width */
+}
+
+.DirectLoginLoader:before {
+  animation: ball1 1s infinite;
+  background-color: #000;
+  box-shadow: 60px 0 0 #007bff; /* Adjusted box-shadow */
+  margin-bottom: 20px; /* Adjusted margin */
+}
+
+.DirectLoginLoader:after {
+  animation: ball2 1s infinite;
+  background-color: #007bff;
+  box-shadow: 60px 0 0 #000; /* Adjusted box-shadow */
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg) scale(0.8);
+  }
+  50% {
+    transform: rotate(360deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(720deg) scale(0.8);
+  }
+}
+
+@keyframes ball1 {
+  0% {
+    box-shadow: 60px 0 0 #007bff; /* Adjusted box-shadow */
+  }
+  50% {
+    box-shadow: 0 0 0 #007bff;
+    margin-bottom: 0;
+    transform: translate(30px, 30px); /* Adjusted translation */
+  }
+  100% {
+    box-shadow: 60px 0 0 #007bff; /* Adjusted box-shadow */
+    margin-bottom: 20px; /* Adjusted margin */
+  }
+}
+
+@keyframes ball2 {
+  0% {
+    box-shadow: 60px 0 0 #000; /* Adjusted box-shadow */
+  }
+  50% {
+    box-shadow: 0 0 0 #000;
+    margin-top: -40px; /* Adjusted margin */
+    transform: translate(30px, 30px); /* Adjusted translation */
+  }
+  100% {
+    box-shadow: 60px 0 0 #000; /* Adjusted box-shadow */
+    margin-top: 0; /* Adjusted margin */
+  }
+}

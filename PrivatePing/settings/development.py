@@ -20,9 +20,12 @@ LOGGING = {
 env = environ.Env()
 environ.Env.read_env()
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
 SECRET_KEY = env('SECRET_KEY')
 SECRET_ADMIN_URL = env('SECRET_ADMIN_URL')
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['127.0.0.1']
 DEBUG = False
 
 CHANNEL_LAYERS = {
@@ -34,12 +37,12 @@ CHANNEL_LAYERS = {
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
-DOMAIN = "http://localhost:8000"
+DOMAIN = "http://127.0.0.1:8000"
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
+CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000"]

@@ -48,9 +48,9 @@ DATABASES['default']['CONN_MAX_AGE'] = 60
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, '../assets/static')
+    BASE_DIR / 'static',
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, '../assets/')
+STATIC_ROOT = BASE_DIR / 'static/staticfiles'
 
 DISABLE_SERVER_SIDE_CURSORS = True
 
