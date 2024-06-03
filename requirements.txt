@@ -45,5 +45,6 @@ ua-parser==0.18.0
 urllib3==2.2.1
 user-agents==2.2.0
 uvicorn==0.30.1
+whitenoise==6.6.0
 wsproto==1.2.0
 zope.interface==6.4.post2
