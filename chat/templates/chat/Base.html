@@ -565,6 +565,14 @@
                 event.preventDefault();
             }
         });
+
+        //detect command key on mac
+        document.addEventListener('keydown', function (event) {
+            if (event.metaKey) {
+                blurContent();
+            }
+        });
+
     </script>
     <script src="{% static 'js/Base.js' %}"></script>
     <script>
