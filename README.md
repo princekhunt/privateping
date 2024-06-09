@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="/assets/images/logo/png/logo-color.png" alt="PrivatePing Logo" width=50%>
+  <img src="assets/static/images/logo/png/logo-color.png" alt="PrivatePing Logo" width=50%>
   <h1>PrivatePing - A Secure Messaging Application</h1>
 </div>
 
