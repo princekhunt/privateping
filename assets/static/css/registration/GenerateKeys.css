@@ -77,14 +77,14 @@ html {
   display: block;
 }
 
-.loader {
+.GenKey-loader {
   width: 64px;
   height: 44px;
   position: relative;
   border: 5px solid #000000;
   border-radius: 8px;
 }
-.loader::before {
+.GenKey-loader::before {
   content: "";
   position: absolute;
   border: 5px solid #000000;
@@ -95,7 +95,7 @@ html {
   top: 0;
   transform: translate(-50%, -100%);
 }
-.loader::after {
+.GenKey-loader::after {
   content: "";
   position: absolute;
   transform: translate(-50%, -50%);

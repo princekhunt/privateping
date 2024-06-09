@@ -2,9 +2,10 @@
 {% block title %}Securing Session{%endblock %} 
 {% load static %} 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/registration/GenerateKeys.css' %}">
 <div id="login-container">
   <div id="login-form">
-    <span class="loader"></span>
+    <span class="GenKey-loader"></span>
     <h1 id="processing">Generating Secure Keypair...</h1>
   </div>
   <script

@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block title %}Anonymous Direct Login{%endblock %}
 {% load static %} {% block content %}
-
+<link rel="stylesheet" href="{% static 'css/registration/AnonymousDirectLogin.css' %}" />
 <div id="login-form">
   {% csrf_token %}
   <span class="DirectLoginLoader"></span>
