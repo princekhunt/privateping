@@ -48,9 +48,9 @@ DATABASES['default']['CONN_MAX_AGE'] = 60
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / 'assets/static',
 ]
-STATIC_ROOT = BASE_DIR / 'static/staticfiles'
+STATIC_ROOT = BASE_DIR / 'assets/staticfiles'
 
 DISABLE_SERVER_SIDE_CURSORS = True
 

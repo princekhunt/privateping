@@ -20,8 +20,6 @@ LOGGING = {
 env = environ.Env()
 environ.Env.read_env()
 
-
-
 SECRET_KEY = env('SECRET_KEY')
 SECRET_ADMIN_URL = env('SECRET_ADMIN_URL')
 ALLOWED_HOSTS = ['localhost']
@@ -36,7 +34,7 @@ CHANNEL_LAYERS = {
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
 
