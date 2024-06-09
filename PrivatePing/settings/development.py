@@ -23,7 +23,7 @@ environ.Env.read_env()
 SECRET_KEY = env('SECRET_KEY')
 SECRET_ADMIN_URL = env('SECRET_ADMIN_URL')
 ALLOWED_HOSTS = ['localhost']
-DEBUG = False
+DEBUG = True
 
 CHANNEL_LAYERS = {
     "default": {

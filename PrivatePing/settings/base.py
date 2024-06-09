@@ -1,9 +1,10 @@
+from pathlib import Path
 import os
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PrivatePing.settings")
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PrivatePing.settings")
 
 # Application definition
 
@@ -43,7 +44,7 @@ ROOT_URLCONF = 'PrivatePing.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -91,8 +92,16 @@ USE_TZ = True
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+
+
+STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
+
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, '../assets/static')
+    BASE_DIR / '../assets/static',
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, '../assets/')
-STATIC_URL = '/static/'
+
+STATIC_ROOT = BASE_DIR / '../assets/static/staticfiles'
+MEDIA_ROOT = BASE_DIR / '../assets/static/media'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
