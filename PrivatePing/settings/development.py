@@ -23,7 +23,7 @@ environ.Env.read_env()
 SECRET_KEY = env('SECRET_KEY')
 SECRET_ADMIN_URL = env('SECRET_ADMIN_URL')
 ALLOWED_HOSTS = ['localhost']
-DEBUG = False
+DEBUG = True
 
 CHANNEL_LAYERS = {
     "default": {
@@ -43,3 +43,7 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 DOMAIN = "http://localhost:8000"
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
+
+STATICFILES_DIRS = [
+     os.path.join(BASE_DIR, '../assets/')
+ ]
