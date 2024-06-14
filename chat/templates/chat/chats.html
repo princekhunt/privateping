@@ -23,8 +23,8 @@
         {% csrf_token %}
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <input style="border-radius: 15px;" type="text" placeholder=" Enter your message" name="message"
-                    id="msg_field" autocomplete="off"> &nbsp; &nbsp;
+                <textarea style="border-radius: 15px;" type="text" placeholder=" Enter your message" name="message"
+                    id="msg_field" autocomplete="off" required></textarea> &nbsp; &nbsp;
                     <label class="select" for="MessageDestroy">
                         <select id="MessageDestroy" required="required">
                           <option value="0" selected="selected">Do not destroy</option>
