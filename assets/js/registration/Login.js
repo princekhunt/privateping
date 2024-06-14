@@ -5,7 +5,7 @@ document
     event.preventDefault();
     const username = document.getElementById("username").value.trim();
     if (username == "") {
-      document.getElementById("err_mssg").innerHTML = "user is required!";
+      document.getElementById("err_mssg").innerHTML = "username is required!";
       return false 
     }
     else {   
