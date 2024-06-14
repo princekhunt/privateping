@@ -47,4 +47,3 @@ CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
 STATICFILES_DIRS = [
      os.path.join(BASE_DIR, '../assets/')
  ]
-print("Development settings loaded.")
