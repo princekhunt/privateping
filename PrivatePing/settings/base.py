@@ -35,7 +35,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
     'preventconcurrentlogins.middleware.PreventConcurrentLoginsMiddleware',
-    'registration.middleware.AllowDesktopOnlyMiddleware',
+
+    # Allowing mobile access
+    #'registration.middleware.AllowDesktopOnlyMiddleware',
 ]
 
 ROOT_URLCONF = 'PrivatePing.urls'
