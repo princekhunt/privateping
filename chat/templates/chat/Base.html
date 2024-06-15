@@ -202,75 +202,6 @@
     </div>
     {% if anonymous %}
     <script>
-        //bluring functionality
-        const content = document.getElementById('ChatScreen');
-        let isModalActive = false;
-        function blurContent() {
-            if (!isModalActive) {
-                content.classList.add('blurred');
-            }
-        }
-        function unblurContent() {
-            if (!isModalActive) {
-                content.classList.remove('blurred');
-                window.focus(); 
-            }
-        }
-        // Blur and unblur content when the window loses focus
-        window.addEventListener('blur', blurContent);
-        window.addEventListener('focus', unblurContent);
-
-        // Unblur content when clicking inside the content area
-        content.addEventListener('click', unblurContent);
-
-        //prevents printscreen event. (screenshot)
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'PrintScreen') {
-                navigator.clipboard.writeText('');
-                blurContent();
-                isModalActive = true;
-                Swal.fire({
-                    title: "Attention!",
-                    text: "Screenshots are not allowed!",
-                    icon: "warning",
-                    showCancelButton: false,
-                    confirmButtonColor: "#003d89",
-                    confirmButtonText: "Okay.",
-                    allowOutsideClick: false,
-
-
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        unblurContent();
-                        isModalActive = false;
-                    }
-                })
-                event.preventDefault();
-            }
-        });
-        document.addEventListener('keyup', function (event) {
-            if (event.key === 'PrintScreen') {
-                navigator.clipboard.writeText('');
-                blurContent();
-                Swal.fire({
-                    title: "Attention!",
-                    text: "Screenshots are not allowed!",
-                    icon: "warning",
-                    showCancelButton: false,
-                    confirmButtonColor: "#003d89",
-                    confirmButtonText: "Okay.",
-                    allowOutsideClick: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        unblurContent();
-                        isModalActive = false;
-                    }
-                });
-                isModalActive = true;
-                event.preventDefault();
-            }
-        });
-
         //check cookie
         var Anotified = getCookie("Anotified");
         if (Anotified == null || Anotified == "") {
@@ -565,38 +496,77 @@
         // Websocket script end
     </script>
 
+    <script>
+        //bluring functionality
+        const content = document.getElementById('ChatScreen');
+        let isModalActive = false;
+        function blurContent() {
+            if (!isModalActive) {
+                content.classList.add('blurred');
+            }
+        }
+        function unblurContent() {
+            if (!isModalActive) {
+                content.classList.remove('blurred');
+                window.focus();
+            }
+        }
+        // Blur and unblur content when the window loses focus
+        window.addEventListener('blur', blurContent);
+        window.addEventListener('focus', unblurContent);
+
+        // Unblur content when clicking inside the content area
+        content.addEventListener('click', unblurContent);
+
+        //prevents printscreen event. (screenshot)
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'PrintScreen') {
+                navigator.clipboard.writeText('');
+                blurContent();
+                isModalActive = true;
+                Swal.fire({
+                    title: "Attention!",
+                    text: "Screenshots are not allowed!",
+                    icon: "warning",
+                    showCancelButton: false,
+                    confirmButtonColor: "#003d89",
+                    confirmButtonText: "Okay.",
+                    allowOutsideClick: false,
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        unblurContent();
+                        isModalActive = false;
+                    }
+                })
+                event.preventDefault();
+            }
+        });
+        document.addEventListener('keyup', function (event) {
+            if (event.key === 'PrintScreen') {
+                navigator.clipboard.writeText('');
+                blurContent();
+                Swal.fire({
+                    title: "Attention!",
+                    text: "Screenshots are not allowed!",
+                    icon: "warning",
+                    showCancelButton: false,
+                    confirmButtonColor: "#003d89",
+                    confirmButtonText: "Okay.",
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        unblurContent();
+                        isModalActive = false;
+                    }
+                });
+                isModalActive = true;
+                event.preventDefault();
+            }
+        });
+    </script>
+    <script src="{% static 'js/Base.js' %}"></script>
     <script>
 
         const socketProtocol_2 =
