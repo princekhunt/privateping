@@ -44,7 +44,7 @@
 
 #myInput {
     box-sizing: border-box;
-    background-image: url("{% static 'images/searchicon.png' %}")
+    background-image: url("{% static 'images/searchicon.png' %}");
     background-position: 14px 12px;
     background-repeat: no-repeat;
     font-size: 16px;
@@ -86,3 +86,9 @@
 .dropdown a:hover {background-color: #ddd;}
 
 .show {display: block;}
+
+
+.blurred {
+    filter: blur(10px);
+    transition: filter 0.3s ease-in-out;
+}
