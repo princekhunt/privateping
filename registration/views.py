@@ -136,6 +136,7 @@ def Signup(request):
         else:
             return HttpResponse("<script>alert('Please enter valid details!'); window.location.href='/signup';</script>")
     return render(request, "registration/Signup.html", {"fact": fact})
+
 def UsernameCheck(request):
     if request.method == "GET":
         username = request.GET.get("username")

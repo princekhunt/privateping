@@ -46,4 +46,5 @@ CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
 
 STATICFILES_DIRS = [
      BASE_DIR, 'assets/'
+
  ]

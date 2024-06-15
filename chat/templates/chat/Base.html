@@ -139,20 +139,27 @@
                     {% else %}
                         <li style="opacity: 0.5;" class="list-group-item list-group-item-action">
                     {% endif %}
-                        <div class="row">
-                            <div class="col">
-                                <img style="border-radius: 50%"
-                                    src="https://ui-avatars.com/api/?background=random&color=fff&name={{friend.friend.name}}"
-                                    style="width: 50px; height: 50px" />
-                            </div>
-                            <div class="col">
-                                <div class="row">
-                                    <p>{{friend.friend.name}}</p>
-                                    <div id="live_notification_{{friend.friend.name}}"></div>
-                                       <a id="delete-friend" onclick="delete_friend('{{friend.friend.name}}');"><i class="fas fa-trash"></i></a>
-                                </div>
-                            </div>
+                    <div class="row">
+                        <div class=" col-3" style="margin: 0; padding: 0;">
+                          <img
+                            style="border-radius: 50%"
+                            src="https://ui-avatars.com/api/?background=random&color=fff&name={{friend.friend.name}}"
+                            style="width: 50px; height: 50px"
+                          />
                         </div>
+                        <div class="col-md-8  col-12 d-flex flex-row justify-content-between align-items-center w-full col-auto">
+                            <div class="align-content-center d-flex flex-column justify-content-center px-0" style="line-break: anywhere;">
+                                <p class="h5">{{friend.friend.name}}</p>
+                                <div id="live_notification_{{friend.friend.name}}"></div>
+                            </div>
+                            <a
+                              id="delete-friend"
+                              class="p-0 mx-2"
+                              onclick="delete_friend('{{friend.friend.name}}');"
+                              ><i class="fas fa-trash "></i
+                            ></a>
+                        </div>
+                      </div>
                     </li>
                 </a>
                 {% endfor %}
