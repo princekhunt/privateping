@@ -14,8 +14,16 @@ from django.views.decorators.csrf import csrf_exempt
 domain = DOMAIN
 
 
-# Checks whether the user is authenticated or not. If yes then redirected to chat interface else redirected to the registration interface
 def Home(request):
+    """
+    The Home function handles the initial landing page logic.
+    It includes several key steps:
+
+    1. Checks if the user is authenticated; if yes, redirects to the chat dashboard.
+    2. Fetches a random fact from the database to display on the home page.
+    3. Renders the home page with the fetched fact for GET requests.
+
+    """
     if request.user.is_authenticated:
         return redirect('chat:dashboard')
 
@@ -24,15 +32,28 @@ def Home(request):
     return render(request, "registration/Home.html", {"fact": fact})
 
 
-# Skip the csrd verification
+# Skip the csrf verification
 @csrf_exempt
 def Login(request):
+    """
+    The Login function handles the process of user authentication and login.
+    It includes several key steps:
+
+    1. Checks if the user is already authenticated; if yes, redirects to the chat dashboard.
+    2. Fetches a random fact from the database to display on the login page.
+    3. Handles POST requests for form submissions and constructs variations of the host URL 
+       (with "https://" and "http://") to handle requests without the protocol specified.
+    4. Validates the request host and redirects to an error page if it's invalid.
+    5. Authenticates the user by fetching the username and password from the request.
+    6. Logs the user in if the credentials are valid and redirects to the key generation page.
+    7. Renders the login page with an error message if the credentials are invalid.
+    8. Renders the login page with a random fact for GET requests.
+
+    """
     if request.user.is_authenticated:
         return redirect('chat:dashboard')
 
     fact = facts.objects.order_by('?').first()
-    # POST for form submissions and constructs two variations of the host URL: one with "https://" and one with "http://".
-    # This is done to handle cases where the request might not include the protocol.
     if request.method == "POST":
         curr_host = request.META.get("HTTP_HOST")
         if not curr_host.startswith("http"):
@@ -40,9 +61,10 @@ def Login(request):
             curr_host2 = "http://" + curr_host
         if curr_host1 != domain and curr_host2 != domain:
             return HttpResponse("<script>alert('Invalid Request!'); window.location.href='/login';</script>")
-
-        # Authenticates after fetching the username and the password and logs the user in
-        # Else in case of invalid credentials login page is redendered with the error
+        '''
+        Authenticates after fetching the username and the password and logs the user in
+        Else in case of invalid credentials login page is rendered with the error
+        '''
         username = request.POST.get("username")
         password = request.POST.get("password")
         user = authenticate(username=username, password=password)
@@ -57,12 +79,15 @@ def Login(request):
 
 
 def GenerateKeys(request):
-    '''
-    Checks wheter the user is authenticated or not.
-    If authenticated then user profile is retrived and the E2EE key is fetched.
-    Its is updated if it already exists else it is stored in database.
-    After POST processign, redirected to Dashboard constructing the absolute url
-    '''
+    """
+    The GenerateKeys function handles the process of generating and updating keys for end-to-end encryption.
+    It includes several key steps:
+    
+    1. Check whether the user is authenticated or not.
+    2. If authenticated, retrieve the user profile and fetch the E2EE key.
+    3. Update the key if it already exists; otherwise, store it in the database.
+    4. After POST processing, redirect to Dashboard by constructing the absolute URL.
+    """
     if not request.user.is_authenticated:
         return redirect('registration:login')
 
@@ -87,14 +112,14 @@ def Logout(request):
     It includes several key steps:
 
     1. Checks if the user is authenticated; if not, redirects to the login page.
-    2. If authenticated, retrieves the user's profile and updates their status to offline.
+    2. If authenticated, retrieve the user's profile and update their status to offline.
     3. Updates any friends' profiles that reference the current user's profile.
     4. Clears the user's public key if it exists.
-    5. If the user is of type 'Anonymous', deletes associated friends, user type, 
+    5. If the user is of type 'Anonymous', delete associated friends, user type, 
        user profile, and the user account itself.
     6. Logs out the user, ending their session.
     7. Clears local storage and relevant cookies from the user's browser.
-    8. Redirects the user to the home page.
+    8. Redirect the user to the home page.
     """
 
     # Check if the user is authenticated; if not, redirect to the login page
@@ -267,7 +292,7 @@ def AnonymousDirectLogin(request):
     1. Checks if the user is already authenticated; if so, redirects to the dashboard.
     2. Processes the POST request to create an anonymous user:
         a. Generates a random username.
-        b. Creates a random password.
+        b. Create a random password.
         c. Creates the anonymous user with a dummy email address.
         d. Saves the user and their profile.
         e. Authenticates and logs in the new anonymous user.
