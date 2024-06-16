@@ -79,7 +79,7 @@ def chat(request, username):
 
     #messages = Messages.objects.filter(sender_name=id, receiver_name=friend.id) | Messages.objects.filter(sender_name=friend.id, receiver_name=id)
     public_key = Keys.objects.get(user=friend).public_key  # Get the friend's public key
-    public_key = base64.b64encode(public_key.encode('utf-8')).decode('utf-8'L encode the public key
+    public_key = base64.b64encode(public_key.encode('utf-8')).decode('utf-8')# encode the public key
     public_key = urllib.parse.quote_plus(public_key)  # URL encode the public key
     friends = getFriendsList(id)  # Get the friends list for the current user
 
