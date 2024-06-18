@@ -15,6 +15,7 @@ function getCookie(name) {
   return cookieValue;
 }
 
+var RequestSent = false;
 setInterval(() => {
             //convert to JSON
             var formData = $("#anonymous-direct-login-form").serializeArray().reduce(function(obj, item) {
@@ -26,6 +27,10 @@ setInterval(() => {
             if(formData['h-captcha-response'].length < 1){
               return;
             }
+            if(RequestSent){
+              return;
+            }
+            RequestSent = true;
         $.ajax({
           type: "POST",
           url: $("#anonymous-direct-login-form").attr('action'),
