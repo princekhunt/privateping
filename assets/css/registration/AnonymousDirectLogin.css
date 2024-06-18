@@ -11,76 +11,23 @@ html {
 
 #login-container {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-#login-form {
+#anonymous-direct-login-form {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
 }
 
-.input-container {
-  position: relative;
-  overflow: hidden; /* Ensures the overflow is hidden for animation */
-}
-
-.input-field {
-  width: 250px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  outline: none;
-  transition: transform 0.5s ease; /* Define the transition property */
-}
-
-.login-button {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  width: 50px;
-  height: 100%;
-  padding: 0;
-  border: none;
-  border-radius: 0 5px 5px 0;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  font-size: 24px;
-  line-height: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.login-button:hover {
-  background-color: #0056b3;
-}
-
-.login-button:active {
-  background-color: #004080;
-}
-#password-field {
-  display: none;
-}
-
-#password-field.active {
-  display: block;
-}
-
-#password-button {
-  display: none;
-}
-
-#password-button.active {
-  display: block;
-}
-
 .DirectLoginLoader {
   animation: rotate 1s infinite;
   height: 100px; /* Increased height */
   width: 100px; /* Increased width */
+  margin-bottom: 20px; /* Add margin to separate from the text */
 }
 
 .DirectLoginLoader:before,
@@ -96,7 +43,6 @@ html {
   animation: ball1 1s infinite;
   background-color: #000;
   box-shadow: 60px 0 0 #007bff; /* Adjusted box-shadow */
-  margin-bottom: 20px; /* Adjusted margin */
 }
 
 .DirectLoginLoader:after {

@@ -1,16 +1,13 @@
-{% load static %}
+{%load static%}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <meta name="description" content="PrivatePing - Anynoumous Direct Login" />
+  <meta name="description" content="PrivatePing - Anonymous Direct Login" />
   <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' {{domain}}">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Nunito&family=Open+Sans:ital,wght@0,300;0,400;1,300&family=Solitreo&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Nunito&family=Open+Sans:ital,wght@0,300;0,400;1,300&family=Solitreo&display=swap" rel="stylesheet" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="stylesheet" href="{% static 'css/registration/AnonymousDirectLogin.css' %}" />
 
@@ -30,15 +27,20 @@
 </head>
 
 <body>
-  <div id="login-form"> {% csrf_token %}
-    <span class="DirectLoginLoader"></span>
-    <h1 style="text-align: center" id="processing">Checking Browser...</h1>
-    <small style="text-align: center">This temporary account will be deleted, once you Logout.</small>
-  </div>
+  <form id="anonymous-direct-login-form" method="post">
+    {% csrf_token %}
+    <div id="login-container">
+      <span class="DirectLoginLoader"></span>
+      <h1>Checking Browser...</h1>
+      <small>This temporary account will be deleted once you Logout.</small>
+      <div class="captcha-container">
+        {{ form.hcaptcha }}
+      </div>
+      <button id="btn-create" type="submit" name="action" style="border-radius: 12px; background-color: #007bff; color: white; padding: 10px 20px;" value="create">Create Anonymous User</button>
 
+    </div>
+  </form>
   <script type="text/javascript" src="{% static 'js/registration/AnonymousDirectLogin.js' %}"></script>
   <script src="{% static 'js/Base.js' %}"></script>
-
 </body>
-
 </html>
