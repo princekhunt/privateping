@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from chat.models import UserProfile
 from hcaptcha.fields import hCaptchaField
 
-
 class SignUpForm(forms.Form):
 
     username = forms.CharField(min_length=5, max_length=20)

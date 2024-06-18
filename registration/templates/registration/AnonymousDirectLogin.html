@@ -27,19 +27,21 @@
 </head>
 
 <body>
-  <form id="anonymous-direct-login-form" method="post">
+
+  <form id="anonymous-direct-login-form">
     {% csrf_token %}
     <div id="login-container">
       <span class="DirectLoginLoader"></span>
-      <h1>Checking Browser...</h1>
+      <h1 style="text-align: center" id="processing">Checking Browser...</h1>
       <small>This temporary account will be deleted once you Logout.</small>
       <div class="captcha-container">
         {{ form.hcaptcha }}
       </div>
-      <button id="btn-create" type="submit" name="action" style="border-radius: 12px; background-color: #007bff; color: white; padding: 10px 20px;" value="create">Create Anonymous User</button>
+      <input name="action" type="hidden" value="create" />
 
     </div>
   </form>
+
   <script type="text/javascript" src="{% static 'js/registration/AnonymousDirectLogin.js' %}"></script>
   <script src="{% static 'js/Base.js' %}"></script>
 </body>

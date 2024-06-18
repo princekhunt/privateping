@@ -92,3 +92,7 @@ html {
     margin-top: 0; /* Adjusted margin */
   }
 }
+
+.captcha-container{
+  margin-top: 2rem;
+}

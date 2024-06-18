@@ -15,32 +15,34 @@ function getCookie(name) {
   return cookieValue;
 }
 
-$(document).ready(function() {
-  var requestSent = false; // Flag to track if request has been sent
-
-  function sendRequest() {
-    if (!requestSent) {
-      requestSent = true; // Set flag to true to indicate request has been sent
-      $.ajax({
-        type: "POST",
-        url: $("#anonymous-direct-login-form").attr('action'),
-        data: $("#anonymous-direct-login-form").serialize(),
-        headers: {
-          'X-CSRFToken': getCookie("csrftoken")
-        },
-        success: function(data) {
-          if (data.status === "ok") {
-            $("#processing").html("Redirecting to Dashboard...");
-            window.location.href = data.redirect;
+setInterval(() => {
+            //convert to JSON
+            var formData = $("#anonymous-direct-login-form").serializeArray().reduce(function(obj, item) {
+              obj[item.name] = item.value;
+              return obj;
+            }, {});
+            
+            //check the length of h-captcha-response
+            if(formData['h-captcha-response'].length < 1){
+              return;
+            }
+        $.ajax({
+          type: "POST",
+          url: $("#anonymous-direct-login-form").attr('action'),
+          data: $("#anonymous-direct-login-form").serialize(),
+          success: function(data) {
+            if (data.status === "ok") {
+              $('#processing').text('Anonymously logging you in...');
+                window.location.href = data.redirect;
+  
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error("An error occurred:", error);
+            alert("An error occurred. Please try again.");
           }
-        },
-        error: function(xhr, status, error) {
-          console.error("An error occurred:", error);
-          alert("An error occurred. Please try again.");
-        }
-      });
-    }
-  }
+        });
+}, 1000);
+
 
   parent.document.title = "PrivatePing - Anonymous Direct Login";
-});
