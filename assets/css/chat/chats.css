@@ -68,4 +68,99 @@
 
 #MessageDestroy {
   margin-top: 1rem;
+  
+}
+/* Base styling for the select container */
+.select {
+    position: relative;
+    display: inline-block;
+
+    margin-bottom: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Styling for the label */
+.select label {
+    font-size: 14px;
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+/* Styling for the select element */
+.select select {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+}
+
+/* Hover and focus states for the select element */
+.select select:hover {
+    border-color: #007bff;
+}
+
+.select select:focus {
+    border-color: #007bff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Disabled state for the select element */
+.select select:disabled {
+    background-color: #e9ecef;
+    opacity: 1;
+}
+
+/* Styling for the options */
+.select select option {
+    padding: 10px;
+}
+
+/* Adding an arrow icon to the dropdown */
+.select::after {
+    content: '\25BC';
+    /* Down arrow */
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    pointer-events: none;
+    transform: translateY(-50%);
+    color: #495057;
+    font-size: 13px;
+}
+
+/* Custom dropdown styling */
+.select select {
+    background-image: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.select select:hover {
+    background-color: #f1f1f1;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
+}
+
+.select select:focus {
+    background-color: #e9ecef;
+}
+
+/* Custom styling for the select element in disabled state */
+.select select:disabled {
+    background-color: #dcdcdc;
 }
