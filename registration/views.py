@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from registration.forms import SignUpForm
+from registration.forms import SignUpForm, CustomSignupForm
 from django.contrib.auth import login, authenticate, logout
 from chat.models import UserProfile, Keys, Friends
 from django.http import JsonResponse, HttpResponse
@@ -288,7 +288,6 @@ def AnonymousDirectLogin(request):
     """
     The AnonymousDirectLogin function handles anonymous user login for the system.
     It includes several key steps:
-
     1. Checks if the user is already authenticated; if so, redirects to the dashboard.
     2. Processes the POST request to create an anonymous user:
         a. Generates a random username.
@@ -306,38 +305,46 @@ def AnonymousDirectLogin(request):
 
     # Process the POST request to create an anonymous user
     if request.method == "POST":
-        # Get the action from the POST request
-        action = request.POST.get("action")
-        # If the action is to create a new anonymous user
-        if action == "create":
-            # Generate a random username
-            username = generate_username()
-            name = username
-            # Create a random password
-            password = ''.join(random.choices("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", k=8))
-            # Create a dummy email address
-            email = username + "@noemailrequired.com"
+        form = CustomSignupForm(request.POST)
 
-            # Create the anonymous user with the generated credentials
-            user = User.objects.create_user(username=username, email=email, password=password)
-            # Save the user type as Anonymous
-            user_type.objects.create(user=user, type="Anonymous")
-            # Save the user profile
-            UserProfile.objects.create(user=user, name=username, username=username)
+        if form.is_valid():
+            # Get the action from the POST request
+            action = request.POST.get("action")
+            # If the action is to create a new anonymous user
+            if action == "create":
+                # Generate a random username
+                username = generate_username()
+                name = username
+                # Create a random password
+                password = ''.join(random.choices("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", k=8))
+                # Create a dummy email address
+                email = username + "@noemailrequired.com"
 
-            # Authenticate and log in the new anonymous user
-            user = authenticate(username=username, password=password)
-            login(request, user)
+                # Create the anonymous user with the generated credentials
+                user = User.objects.create_user(username=username, email=email, password=password)
+                # Save the user type as Anonymous
+                user_type.objects.create(user=user, type="Anonymous")
+                # Save the user profile
+                UserProfile.objects.create(user=user, name=username, username=username)
 
-            # Return a JSON response with a redirect to the generate keys page
-            return JsonResponse(
-                {
-                    "status": "ok",
-                    "redirect": request.build_absolute_uri("/generate_keys")
-                }
-            )
+                # Authenticate and log in the new anonymous user
+                user = authenticate(username=username, password=password)
+                login(request, user)
+
+                # Return a JSON response with a redirect to the generate keys page
+                JsonResponse(
+                    {
+                        "status": "ok",
+                        "redirect": request.build_absolute_uri("/generate_keys")
+                    }
+                )
+                return redirect('chat:dashboard')
+
+    else:
+        form = CustomSignupForm()
+
     # Render the anonymous direct login page if the request method is not POST
-    return render(request, "registration/AnonymousDirectLogin.html")
+    return render(request, "registration/AnonymousDirectLogin.html", {"form": form})
 
 
 def Base(request):

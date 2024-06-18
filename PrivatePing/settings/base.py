@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'channels',
     'django_user_agents',
     'preventconcurrentlogins',
+    'hcaptcha',
 
 ]
 
@@ -38,6 +39,9 @@ MIDDLEWARE = [
     'registration.middleware.AllowDesktopOnlyMiddleware',
 ]
 
+AUTHENTICATION_BACKENDS = ( 
+    'django.contrib.auth.backends.ModelBackend', 
+)
 ROOT_URLCONF = 'PrivatePing.urls'
 
 TEMPLATES = [
