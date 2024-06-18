@@ -90,7 +90,6 @@ def GenerateKeys(request):
     """
     if not request.user.is_authenticated:
         return redirect('registration:login')
-
     if request.method == "POST":
         user = UserProfile.objects.get(user=request.user)
         public_key = request.POST.get("public_key")
@@ -332,14 +331,12 @@ def AnonymousDirectLogin(request):
                 login(request, user)
 
                 # Return a JSON response with a redirect to the generate keys page
-                JsonResponse(
+                return JsonResponse(
                     {
                         "status": "ok",
                         "redirect": request.build_absolute_uri("/generate_keys")
                     }
                 )
-                return redirect('chat:dashboard')
-
     else:
         form = CustomSignupForm()
 

@@ -14,6 +14,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 DEBUG = False
 ALLOWED_HOSTS = ['privateping.bytespot.tech', 'dev.privateping.bytespot.tech']
 
+HCAPTCHA_SITEKEY = os.environ.get('HCAPTCHA_SITEKEY')
+HCAPTCHA_SECRET = os.environ.get('HCAPTCHA_SECRET')
 
 SECURE_HSTS_SECONDS = 60
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
