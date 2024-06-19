@@ -52,6 +52,25 @@
 .greet{
   margin-top: 15vh; 
   text-align: center;
+  animation: colorChange 5s infinite;
+}
+
+@keyframes colorChange {
+  0% {
+    color: red;
+  }
+  25% {
+    color: blue;
+  }
+  50% {
+    color: green;
+  }
+  75% {
+    color: purple;
+  }
+  100% {
+    color: red;
+  }
 }
 
 .greet-tagline{

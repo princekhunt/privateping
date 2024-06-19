@@ -8,19 +8,31 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+
+    <!--1st-->
     <link rel="stylesheet" href="{% static 'css/base_style.css' %}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.min.css" integrity="sha256-h2Gkn+H33lnKlQTNntQyLXMWq7/9XI2rlPCsLsVcUBs=" crossorigin="anonymous">
+
+ 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!--1st-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
     <link
         href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Nunito&family=Open+Sans:ital,wght@0,300;0,400;1,300&family=Solitreo&display=swap"
         rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <!--1st-->
     <link rel="stylesheet" href="{% static 'css/chat/Base.css' %}" />
     <link rel="stylesheet" href="{% static 'css/chat.css' %}" />
+
+
     <script type="text/javascript" src="{% static 'js/chat/Base.js' %}"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
@@ -180,9 +192,11 @@
 
     <div class="main">
         {% block content %}
-        <div class="greet">
-            <h4>🙋‍♂️ नमस्ते {{request.user}}</h4>
+
+        <div class="greet"> <!--नमस्ते-->
+            <h4>🙋‍♂️ <p id="changeTxt"></p></h4>
         </div>
+
         <div class="greet-tagline">
             <h2>Privacy is a <u>Fundamental</u> Right!</h2>
             <small><i class="fa fa-lock"></i> Your messages are protected with
@@ -654,3 +668,18 @@ $("#msg_field").on("keypress", function (e) {
 </body>
 
 </html>
+
+<script>
+    var cit = new Array("नमस्ते", " Bonjour ", " Hello", " Ciao ", "Anyoung");
+    var ind= 0;
+    function ChangeText(){
+        document.getElementById('changeTxt').innerHTML = cit[ind];          
+        if(ind < cit.length - 1 ){
+            ind++;
+        }else{
+            ind = 0;
+        }
+        setTimeout("ChangeText();", 1000);
+}
+ChangeText();
+</script>
