@@ -188,7 +188,7 @@
     <div class="main" id="ChatScreen">
         {% block content %}
         <div class="greet"><!--code changed here-->
-            <h4>🙋‍♂️  <p id="changeTxt"></p></h4>
+            <h4>🙋‍♂️  <p id="changeTxt"> {{request.user}}</p></h4>
         </div>
         <div class="greet-tagline">
             <h2>Privacy is a <u>Fundamental</u> Right!</h2>
