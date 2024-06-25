@@ -1,9 +1,11 @@
+from pathlib import Path
+
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PrivatePing.settings")
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Application definition
 

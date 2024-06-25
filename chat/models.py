@@ -22,7 +22,8 @@ class Friends(models.Model):
     note = models.CharField(max_length=100, blank=True, default="")
     accepted = models.BooleanField(default=False)
     
-
+    class Meta:
+        verbose_name_plural = "Friends"
 
     def __str__(self):
         return f"{self.user} - {self.friend}"
@@ -33,6 +34,9 @@ class Keys(models.Model):
     id = models.AutoField(primary_key=True, unique=True, editable=False, blank=True)
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     public_key = models.TextField()
+    
+    class Meta:
+        verbose_name_plural = "Keys"
 
     def __str__(self):
         return f"{self.user}"
