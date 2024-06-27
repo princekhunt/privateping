@@ -1,0 +1,53 @@
+/* styles.css */
+
+/* Modal Header */
+.modal-header {
+    background-color: #007bff; /* Example color */
+    color: #fff;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+/* Modal Body */
+.modal-body {
+    text-align: center;
+}
+
+/* Form and Inputs */
+#adduserform {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    border-radius: 0.25rem;
+}
+
+textarea.form-control {
+    min-height: 100px; /* Adjust height as needed */
+}
+
+/* Optional Note Label */
+small {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Submit Button */
+#adduserbutton {
+    width: 100%; /* Full-width button */
+}
+
+.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-outline-primary:hover {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
