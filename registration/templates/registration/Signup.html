@@ -82,7 +82,7 @@
                         <p style="color: antiquewhite; margin-bottom:2px;">What should we call you?</p>
                         <div class="input-container">
                             <input type="text" class="input-field input-field-1" id="name" name="name"
-                                placeholder="Name" autocomplete="off">
+                                placeholder="Name" autocomplete="off" required>
                             <button class="login-button" id="name-button">&rarr;</button>
                         </div>
                     </div>
@@ -91,7 +91,7 @@
                         <p style="color: antiquewhite;">Enter Username</p>
                         <div class="input-container">
                             <input type="text" class="input-field input-field-1" id="username" name="username"
-                                placeholder="Username" autocomplete="off">
+                                placeholder="Username" autocomplete="off" required>
                             <button class="login-button" id="username-button">&rarr;</button>
                         </div>
                         <p id="username-error-field"
@@ -102,7 +102,7 @@
                         <p style="color: antiquewhite;">Enter Password</p>
                         <div class="input-container">
                             <input type="password" class="input-field input-field-2" id="password-1" name="password1"
-                                placeholder="Password" autocomplete="off">
+                                placeholder="Password" autocomplete="off" required>
                             <button class="login-button" id="password-1-button"><span>&rarr;</span></button>
                         </div>
                         <p style="color: antiquewhite;" id="password-text"></p>
@@ -113,7 +113,7 @@
                         <p style="color: antiquewhite;">Confirm Password</p>
                         <div class="input-container">
                             <input type="password" class="input-field input-field-2" id="password-2" name="password2"
-                                placeholder="Confirm Password" autocomplete="off">
+                                placeholder="Confirm Password" autocomplete="off" required>
                             <button type="submit" class="login-button" id="login-button"><span>&#10003;</span></button>
                         </div>
                         {% if error %}
