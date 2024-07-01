@@ -6,7 +6,20 @@
 Project Lead: Prince Khunt [https://www.linkedin.com/in/princekhunt/]
 
 Developers: Prince Khunt [https://www.linkedin.com/in/princekhunt/], Viraj Bhingradiya [https://www.linkedin.com/in/viraj-bhingradiya-720b39216]
-Contributors: Prince Khunt, Viraj Bhingradiya, and You?
+
+Contributors: 
+Prince Khunt [https://github.com/princekhunt], 
+Sniper marube [https://github.com/snipher-marube], 
+Mayuresh Dharwadkar [https://github.com/Mayureshd-18], 
+Sudarshan kakde [https://github.com/sudarshankakde],  
+Umashri V Meti [https://github.com/MetiUmashri], 
+Keshav Dev Sharma [https://github.com/HWKDS], 
+Yash Singhal [https://github.com/mryashsinghal], 
+Merajul Arefin [https://github.com/j0ker70], 
+Priyanshu Sahoo [https://github.com/Priyanshu2631], 
+VIraj1211 [https://github.com/Bidu1211],
+Ashish Kumar [https://github.com/ashish0kumar]
+and You?
 
 /* SITE */
 - Website: https://privateping.bytespot.tech
