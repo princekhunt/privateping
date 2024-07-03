@@ -44,3 +44,9 @@ $(document).ready(function(){
         }
     }, 1000); // Check every 1 seconds, adjust as needed
 });
+
+//goback
+function goback(){
+    window.history.back();
+  
+  }
