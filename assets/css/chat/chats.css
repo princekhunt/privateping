@@ -1,6 +1,7 @@
-.html {
-  font-family: "Nunito", sans-serif;
+.p, h1, h2, h3, h4, h5, h6, small{
+  font-family: 'Proxima Nova', Georgia, sans-serif;
 }
+
 
 .logged-in {
   color: rgb(249, 217, 91);
@@ -76,8 +77,8 @@
     display: inline-block;
 
     margin-bottom: 20px;
-    font-family: 'Arial', sans-serif;
-}
+    font-family: 'proxima_nova_ltthin', Georgia, sans-serif !important;
+  }
 
 /* Styling for the label */
 .select label {

@@ -1,5 +1,5 @@
-.html {
-  font-family: "Nunito", sans-serif;
+.p, h1, h2, h3, h4, h5, h6, small{
+  font-family: 'Proxima Nova', Georgia, sans-serif;
 }
 
 .circle-icon {
