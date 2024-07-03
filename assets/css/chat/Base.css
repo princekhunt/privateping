@@ -93,7 +93,7 @@ textarea.add-user-input {
   resize: vertical;
 }
 
-button[type="submit"] {
+#adduserbutton {
   width: 100%;
   padding: 12px 15px;
   border: none;
@@ -106,7 +106,7 @@ button[type="submit"] {
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-button[type="submit"]:hover {
+#adduserbutton:hover {
   background-color: #0056b3;
   box-shadow: 0 2px 5px rgba(0, 91, 179, 0.3);
 }
