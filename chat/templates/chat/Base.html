@@ -196,7 +196,6 @@
         </div>
         {% endblock %}
     </div>
-    {% if anonymous %}
 
     <script>
         var cit = new Array("नमस्ते", " Bonjour ", " Hello", " Ciao ", "Anyoung");
@@ -213,6 +212,7 @@
 ChangeText();
     </script>
 
+    {% if anonymous %}
     <script>
         //check cookie
         var Anotified = getCookie("Anotified");
