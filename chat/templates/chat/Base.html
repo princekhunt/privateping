@@ -185,6 +185,7 @@
         {% block content %}
         <div class="greet">
             <h4><p id="changeTxt"></p></h4>
+            <div id="profile-link" onclick="CopyProfile();"><i class="fas fa-link"></i> Copy Profile link</div>
         </div>
         <div class="greet-tagline">
             <h2>Privacy is a <u>Fundamental</u> Right!</h2>
@@ -210,6 +211,17 @@
        setTimeout("ChangeText();", 1000);
 }
 ChangeText();
+    </script>
+
+    <script>
+        function CopyProfile(){
+            const CurrentProtocol =
+            window.location.protocol === "https:" ? "https" : "http";
+            CurrentUser = "{{request.user}}"
+            var ProfileURL = CurrentProtocol + "://" + window.location.host + "/addfriend/" + escapeHtml(CurrentUser) + "?note=";
+            navigator.clipboard.writeText(ProfileURL);
+            alert("Profile URL has been copied to clipboard, You can share the link now!");
+        }
     </script>
 
     {% if anonymous %}

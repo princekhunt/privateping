@@ -128,3 +128,7 @@ textarea.add-user-input {
   color: rgb(255, 91, 91);
   cursor: pointer;
 }
+#profile-link{
+  text-decoration: underline;
+  cursor: pointer;
+}
