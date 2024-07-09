@@ -27,10 +27,10 @@ To get started:
 2. You can either:
    - Sign up for a standard account using your email address, and Login using your credentials to continue.
    - Alternatively, use the option for anonymous direct login, which creates a temporary account for you valid for the next 24 hours. No private information will be attached to this account.
-3. After successfully logging into the account, share your username with your friend to get started.
-4. Click on the "Add User" button on the navigation bar at the top left.
-5. Enter your friend's username and click on "Add".
-6. Note that your friend will also need to add you on their dashboard using the same steps.
+3. After successfully logging into the account, click on "Add User" button on the navigation bar at the top left.
+4. Enter your friend's username and click on "Add". A friend request will be sent to your friend.
+5. Your friend will be able to see upcoming request from you, and can accept or reject the request.
+6. If a friend accepts the request, then you will be able to chat.
 7. Once added, click on the user's name you wish to chat with.
 8. PrivatePing will create a secure room for you both and wait for the other person to connect.
 9. When you and your friend are successfully connected over a secure channel, you can start exchanging encrypted messages, which not even PrivatePing can decipher.
