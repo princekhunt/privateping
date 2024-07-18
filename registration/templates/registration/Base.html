@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="PrivatePing - Anonymous Direct Login" />
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' {{domain}}">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'fonts/fonts.min.css' %}" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!--define favicon for all devices-->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicons/apple-touch-icon.png' %}" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicons/favicon-32x32.png' %}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicons/favicon-16x16.png' %}" />
+
+    <!--define favicon for android chrome-->
+    <link rel="icon" type="image/png" sizes="192x192"
+        href="{% static 'images/favicons/android-chrome-192x192.png' %}" />
+    <link rel="icon" type="image/png" sizes="512x512"
+        href="{% static 'images/favicons/android-chrome-512x512.png' %}" />
+
+    <!--define favicon general-->
+    <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
+
+    {% block content %}{% endblock %}
+
+
+    <script src="{% static 'js/Base.js' %}"></script>
+
+    </body>
+
+</html>

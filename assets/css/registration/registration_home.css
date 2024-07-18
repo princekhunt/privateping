@@ -102,7 +102,7 @@ html {
   align-items: center;
   flex-direction: column;
   background-color: #f0f0f0;
-  font-family: "Nunito", sans-serif;
+  font-family: 'proxima_nova_ltthin', Georgia, sans-serif;
 }
 
 .container {

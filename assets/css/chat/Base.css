@@ -1,5 +1,5 @@
-.html {
-  font-family: "Nunito", sans-serif;
+.p, h1, h2, h3, h4, h5, h6, small{
+  font-family: 'Proxima Nova', Georgia, sans-serif;
 }
 
 .circle-icon {
@@ -64,8 +64,51 @@
   text-align: center
 }
 
-.add-user-input{
-  width: 210px;
+.add-user-input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.add-user-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  outline: none;
+}
+
+small {
+  display: block;
+  margin-bottom: 5px;
+  color: #888;
+}
+
+textarea.add-user-input {
+  height: 100px;
+  resize: vertical;
+}
+
+#adduserbutton {
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 25px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#adduserbutton:hover {
+  background-color: #0056b3;
+  box-shadow: 0 2px 5px rgba(0, 91, 179, 0.3);
 }
 
 .top-nav-header{
@@ -83,5 +126,9 @@
 #delete-friend{
   padding: 1.8rem 0rem 0rem 0rem;
   color: rgb(255, 91, 91);
+  cursor: pointer;
+}
+#profile-link{
+  text-decoration: underline;
   cursor: pointer;
 }

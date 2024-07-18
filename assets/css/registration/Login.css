@@ -74,7 +74,7 @@ html {
   justify-content: center;
   align-items: center;
   background-color: #fff;
-  font-family: "Nunito", sans-serif;
+  font-family: 'proxima_nova_ltthin', Georgia, sans-serif;
 }
 
 #login-container {
