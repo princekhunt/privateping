@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from .models import UserProfile, Friends
 from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse
@@ -40,27 +40,23 @@ def addFriend(request, name):
     If the friend already exists or the user does not exist, it redirects to the dashboard.
     Otherwise, it saves the new friend relationship.
     """
-    friend = name  # Store the friend's name
-    friend = UserProfile.objects.get(username=name)  # Get the friend's UserProfile object
-    note = request.GET.get("note")  # Get the note from the request
+    note = request.GET.get("note", "")
     if len(note) > 100:
-        return HttpResponse("<script>alert('Note too long!'); window.location.href='/dashboard';</script>")
+        return HttpResponse(
+            "<script>alert('Note too long!'); window.location.href='/dashboard';</script>"
+        )
 
-    # Check if the friend's UserProfile exists
-    if not UserProfile.objects.filter(username=friend).exists():
-        return redirect("/dashboard")
+    friend = get_object_or_404(UserProfile, username=name)
+    current_user = get_object_or_404(UserProfile, username=request.user.username)
 
-    # Check if the friend relationship already exists
-    if Friends.objects.filter(user=UserProfile.objects.get(username=request.user.username), friend=friend).exists():
+    if Friends.objects.filter(user=current_user, friend=friend).exists():
         return redirect("/dashboard")
 
     # Create a new friend relationship for the user
-    User_Adding_Friend = Friends(user=UserProfile.objects.get(username=request.user.username), friend=friend, accepted=True)
-    User_Adding_Friend.save()
+    Friends.objects.create(user=current_user, friend=friend, accepted=True)
 
     # Create a new friend relationship for the friend
-    Friend_Adding_User = Friends(user=friend, friend=UserProfile.objects.get(username=request.user.username),note=note, accepted=False)
-    Friend_Adding_User.save()
+    Friends.objects.create(user=friend, friend=current_user, note=note, accepted=False)
 
     return redirect("/dashboard")
 
