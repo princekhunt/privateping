@@ -165,3 +165,7 @@
 .select select:disabled {
     background-color: #dcdcdc;
 }
+
+#live-notification-text{
+  display: inline;
+}
