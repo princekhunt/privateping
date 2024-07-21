@@ -4,7 +4,7 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/chat/chats.css' %}">
 
-<div style="margin-top: 0px">
+<div>
     <h3>{{friend.name}}</h3>
     <span id="live-notification-dot" class="logged-in">● </span><small id="live-notification-text">Connecting...</small>
 </div>
@@ -23,7 +23,7 @@
         {% csrf_token %}
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <textarea style="border-radius: 15px;" type="text" placeholder=" Enter your message" name="message"
+                <textarea class="input-textarea" type="text" placeholder=" Enter your message" name="message"
                     id="msg_field" autocomplete="off" required></textarea> &nbsp; &nbsp;
                     <label class="select" for="MessageDestroy">
                         <select id="MessageDestroy" required="required">
@@ -37,7 +37,7 @@
                           <option value="3600">1 hour</option>
                         </select>
                       </label>&nbsp; &nbsp;
-                <button style="border-radius: 50%;" type="submit" name="send" class="btn btn-primary" id="send_btn"> <i
+                <button type="submit" name="send" class="btn btn-primary send-button" id="send_btn"> <i
                         class="fa-solid fa-paper-plane"></i></button>
 
             </div>

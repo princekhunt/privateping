@@ -84,11 +84,6 @@
   width: 850px;
 }
 
-#send_btn {
-  margin-top: 16px;
-  height: 40px;
-}
-
 .container-darker::after {
   content: "";
   clear: both;

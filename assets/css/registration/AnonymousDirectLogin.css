@@ -96,3 +96,7 @@ html {
 .captcha-container{
   margin-top: 2rem;
 }
+
+.processing-text{
+  text-align: center;
+}

@@ -188,3 +188,35 @@ html {
   border-radius: 50%;
   opacity: 0.8;
 }
+
+.fact-title{
+  color:cornsilk; 
+  margin-top: 2rem;
+}
+
+.fact{
+  color: #ccc;
+}
+
+.antiquewhite{
+  color: antiquewhite;
+}
+
+.name-field{
+  margin-bottom:2px;
+}
+
+.signup-title{
+  color:cornsilk;
+}
+
+.login-container{
+  position: relative;
+}
+
+.error-message{
+  color: rgb(253, 84, 84); 
+  font-size: 18px; 
+  font-weight: bold; 
+  margin-top: 10px;
+}

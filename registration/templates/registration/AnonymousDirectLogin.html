@@ -11,7 +11,7 @@
     {% csrf_token %}
     <div id="login-container">
       <span class="DirectLoginLoader"></span>
-      <h1 style="text-align: center" id="processing">Checking Browser...</h1>
+      <h1 class="processing-text" id="processing">Checking Browser...</h1>
       <small>This temporary account will be deleted once you Logout.</small>
       <div class="captcha-container">
         {{ form.hcaptcha }}

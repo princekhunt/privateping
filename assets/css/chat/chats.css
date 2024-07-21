@@ -176,3 +176,14 @@
   text-align: right; 
   margin-bottom: 5vh;
 }
+
+.input-textarea{
+  border-radius: 15px;
+}
+
+.send-button{
+  border-radius: 50% !important;
+  margin-top: 16px;
+  height: 40px;
+  
+}

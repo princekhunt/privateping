@@ -40,11 +40,11 @@
         </svg>
 
 
-        <div style="position: relative;" id="login-container">
-            <h1 style="color: antiquewhite;">PrivatePing - Login</h1>
+        <div class="login-container" id="login-container">
+            <h1 class="antiquewhite">PrivatePing - Login</h1>
             <div id="login-form">
                 <img src="{% static 'images/user/login.gif' %}" alt="Loading" id="loading-gif" height="40%" width="40%">
-                <h1 style="color: antiquewhite;" id="processing"></h1>
+                <h1 class="antiquewhite" id="processing"></h1>
                 <form id="LoginForm" method="post">{% csrf_token %}
                     <div id="username-form">
                         <div class="input-container">
@@ -61,15 +61,14 @@
                         </div>
                     </div>
                     {% if error %}
-                    <div id="error-field"
-                        style="color: rgb(253, 84, 84); font-size: 18px; font-weight: bold; margin-top: 10px;">Invalid
+                    <div class="error-message" id="error-field">Invalid
                         username or password!</div>
                     {% endif %}
             </div>
             </form>
-            <p id="err_mssg" style="color: rgb(253, 84, 84); font-size: 18px; font-weight: bold; margin-top: 10px;"></p>
-            <p style="color:cornsilk; margin-top: 2rem;">Do you know?</p>
-            <small style="color: #ccc;">{{fact}}</small>
+            <p class="error-message" id="err_mssg"></p>
+            <p class="fact-title">Do you know?</p>
+            <small class="  ">{{fact}}</small>
             <div>
                 <button class="btn-lg btn-primary back-btn" onclick="goback();"><i class="fa fa-arrow-left"
                         aria-hidden="true"></i></button>

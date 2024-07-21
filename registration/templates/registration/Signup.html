@@ -39,16 +39,15 @@
             </g>
         </svg>
 
-        <div style="position: relative;" id="login-container">
-            <h1 style="color:cornsilk;">Let's embark a journey towards privacy!</h1>
+        <div class="login-container" id="login-container">
+            <h1 class="signup-title">Let's embark a journey towards privacy!</h1>
             <div id="login-form">
-                <!--<img src="{% static 'images/user/signup.gif' %}" alt="Loading" id="loading-gif" height="40%" width="40%">-->
                 <span class="userloader"></span>
-                <h1 style="color: antiquewhite;" id="processing"></h1>
+                <h1 class="antiquewhite" id="processing"></h1>
                 <form id="LoginForm" method="post">{% csrf_token %}
 
                     <div id="name-field">
-                        <p style="color: antiquewhite; margin-bottom:2px;">What should we call you?</p>
+                        <p class="name-field antiquewhite">What should we call you?</p>
                         <div class="input-container">
                             <input type="text" class="input-field input-field-1" id="name" name="name"
                                 placeholder="Name" autocomplete="off">
@@ -57,43 +56,41 @@
                     </div>
 
                     <div id="username-field">
-                        <p style="color: antiquewhite;">Enter Username</p>
+                        <p class="antiquewhite">Enter Username</p>
                         <div class="input-container">
                             <input type="text" class="input-field input-field-1" id="username" name="username"
                                 placeholder="Username" autocomplete="off">
                             <button class="login-button" id="username-button">&rarr;</button>
                         </div>
-                        <p id="username-error-field"
-                            style="color: rgb(253, 84, 84); font-size: 18px; font-weight: bold; margin-top: 10px;"></p>
+                        <p class="error-message" id="username-error-field"></p>
                     </div>
 
                     <div id="password-field-1">
-                        <p style="color: antiquewhite;">Enter Password</p>
+                        <p class="antiquewhite">Enter Password</p>
                         <div class="input-container">
                             <input type="password" class="input-field input-field-2" id="password-1" name="password1"
                                 placeholder="Password" autocomplete="off">
                             <button class="login-button" id="password-1-button"><span>&rarr;</span></button>
                         </div>
-                        <p style="color: antiquewhite;" id="password-text"></p>
+                        <p class="antiquewhite" id="password-text"></p>
 
                     </div>
 
                     <div id="password-field-2">
-                        <p style="color: antiquewhite;">Confirm Password</p>
+                        <p class="antiquewhite">Confirm Password</p>
                         <div class="input-container">
                             <input type="password" class="input-field input-field-2" id="password-2" name="password2"
                                 placeholder="Confirm Password" autocomplete="off">
                             <button type="submit" class="login-button" id="login-button"><span>&#10003;</span></button>
                         </div>
                         {% if error %}
-                        <div id="error-field"
-                            style="color: rgb(253, 84, 84); font-size: 18px; font-weight: bold; margin-top: 10px;">
+                        <div class="error-message" id="error-field">
                             Invalid username or password!</div>
                         {% endif %}
                     </div>
                 </form>
-                <p style="color:cornsilk; margin-top: 2rem;">Do you know?</p>
-                <small style="color: #ccc;">{{fact}}</small>
+                <p class="fact-title">Do you know?</p>
+                <small class="fact">{{fact}}</small>
                 <div>
                     <button class="btn-lg btn-primary back-btn" onclick="goback();"><i class="fa fa-arrow-left"
                             aria-hidden="true"></i></button>

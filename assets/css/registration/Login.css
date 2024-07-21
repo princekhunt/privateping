@@ -150,3 +150,28 @@ html {
   border-radius: 50%;
   opacity: 0.8;
 }
+
+.login-container{
+  position: relative;
+}
+
+.antiquewhite{
+  color: antiquewhite;
+
+}
+
+.error-message{
+  color: rgb(253, 84, 84); 
+  font-size: 18px; 
+  font-weight: bold; 
+  margin-top: 10px;
+}
+
+.fact-title{
+  color:cornsilk; 
+  margin-top: 2rem;
+}
+
+.fact{
+  color: #ccc;
+}

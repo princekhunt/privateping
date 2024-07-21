@@ -266,3 +266,17 @@ html {
     transform: scale(1);
   }
 }
+
+.fact-title{
+  color:#686868; 
+  margin-top: 2rem; 
+  margin-bottom: 0;
+}
+
+.fact{
+  color: #686868;
+}
+
+.credits{
+  text-align: center;
+}
