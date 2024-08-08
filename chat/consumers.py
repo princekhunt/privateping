@@ -13,9 +13,21 @@ class ChatConsumer(WebsocketConsumer):
     http_user_and_session = True
     def connect(self):
         user = self.scope["user"]
-        UpdateStatus = UserProfile.objects.get(username=user)
-        UpdateStatus.online = 1
-        UpdateStatus.save()
+        
+        # If user is not authenticated, close the connection.
+        if not user.is_authenticated:
+            self.close()
+            return
+        
+        # handle the case where the user might not exist
+        try:
+            UpdateStatus = UserProfile.objects.get(username=user)
+            UpdateStatus.online = 1
+            UpdateStatus.save()
+        except UserProfile.DoesNotExist:
+            self.close()
+            return
+        
         self.room_name = "box_"+str(user)
         async_to_sync(self.channel_layer.group_add)(
             self.room_name,
@@ -24,10 +36,29 @@ class ChatConsumer(WebsocketConsumer):
         self.accept()
 
     def receive(self, text_data=None, bytes_data=None):
-        text_data_json = json.loads(text_data)
+        # handle cases where the input might not be valid JSON
+        try:
+            text_data_json = json.loads(text_data)
+        except json.JSONDecodeError:
+            self.send(text_data=json.dumps({
+                'message': "Invalid JSON",
+                'status': "error",
+                'destroy': 0
+            }))
+            return
+        
         message = text_data_json['message']
         to = text_data_json['to']
         destroy = text_data_json['destroy']
+        
+        # checks to ensure message, to, and destroy are present and valid
+        if not message or not to or isinstance(destroy, int):
+            self.send(text_data=json.dumps({
+                'message': "Invalid JSON",
+                'status': "error",
+                'destroy': 0
+            }))
+            return
 
         if message == "ping":
             self.send(text_data=json.dumps({
@@ -56,10 +87,18 @@ class ChatConsumer(WebsocketConsumer):
 
     def disconnect(self, code):
         user = self.scope["user"]
-        UpdateStatus = UserProfile.objects.get(username=user)
-        UpdateStatus.online = 0
-        UpdateStatus.online_for = None
-        UpdateStatus.save()
+        '''
+        # handle the case where the user might not exist
+        # handle the case where the user might not exist in the UserProfile model during the disconnect process. 
+        # This is to ensure that the user is removed from the online list when they disconnect.
+        '''
+        try:
+            UpdateStatus = UserProfile.objects.get(username=user)
+            UpdateStatus.online = 0
+            UpdateStatus.online_for = None
+            UpdateStatus.save()
+        except UserProfile.DoesNotExist:
+            pass
         self.close()
 
 
