@@ -10,7 +10,7 @@ DEBUG = False
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-ALLOWED_HOSTS = ['privateping.bytespot.tech', 'dev.privateping.bytespot.tech']
+ALLOWED_HOSTS = ['privateping.apps.princekhunt.com']
 SECRET_ADMIN_URL = os.environ.get('SECRET_ADMIN_URL')
 
 #hcaptcha config

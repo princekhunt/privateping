@@ -3,7 +3,7 @@
   <h1>PrivatePing - A Secure Messaging Application</h1>
 </div>
 
-[![Website Status](https://img.shields.io/website?url=https%3A%2F%2Fprivateping.bytespot.tech)](https://privateping.bytespot.tech)
+[![Website Status](https://img.shields.io/website?url=https%3A%2F%2Fprivateping.apps.princekhunt.com)](https://privateping.apps.princekhunt.com)
 [![first-timers](https://img.shields.io/badge/first--timers--friendly-blue.svg?style=flat-square)](https://www.firsttimersonly.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -23,7 +23,7 @@ PrivatePing is a secure messaging application built on Python's Django framework
 PrivatePing is hosted on Heroku. It is accessible through a web browser. Users can register, log in securely, and exchange encrypted messages with each other without the need to install or run the application locally.
 
 To get started:
-1. Visit [PrivatePing](https://privateping.bytespot.tech) in your web browser.
+1. Visit [PrivatePing](https://privateping.apps.princekhunt.com) in your web browser.
 2. You can either:
    - Sign up for a standard account using your email address, and Login using your credentials to continue.
    - Alternatively, use the option for anonymous direct login, which creates a temporary account for you valid for the next 24 hours. No private information will be attached to this account.
@@ -109,7 +109,7 @@ If you prefer not to use the provided installation script or encounter any issue
 
 ## Contributors
 
-We extend our heartfelt gratitude to all contributors who have helped improve PrivatePing! Your efforts are greatly appreciated. See the [humans.txt](https://privateping.bytespot.tech/humans.txt) page for a list of contributors.
+We extend our heartfelt gratitude to all contributors who have helped improve PrivatePing! Your efforts are greatly appreciated. See the [humans.txt](https://privateping.apps.princekhunt.com/humans.txt) page for a list of contributors.
 
 Contributions are welcome! If you'd like to contribute to PrivatePing, please follow these guidelines:
 

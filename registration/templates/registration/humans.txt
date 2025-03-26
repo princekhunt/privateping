@@ -22,7 +22,7 @@ Ashish Kumar [https://github.com/ashish0kumar]
 and You?
 
 /* SITE */
-- Website: https://privateping.bytespot.tech
+- Website: https://privateping.apps.princekhunt.com
 - GitHub: https://github.com/princekhunt/privateping
 - License: MIT License
 
