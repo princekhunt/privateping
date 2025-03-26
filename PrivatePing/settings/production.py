@@ -58,4 +58,4 @@ STATIC_ROOT = BASE_DIR / '../assets/'
 
 DISABLE_SERVER_SIDE_CURSORS = True
 
-DOMAIN = "https://privateping.bytespot.tech"
+DOMAIN = "https://privateping.apps.princekhunt.com"
