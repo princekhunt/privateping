@@ -23,16 +23,18 @@ environ.Env.read_env()
 SECRET_KEY = env('SECRET_KEY')
 SECRET_ADMIN_URL = env('SECRET_ADMIN_URL')
 
-HCAPTCHA_SITEKEY = env('HCAPTCHA_SITEKEY')
-HCAPTCHA_SECRET = env('HCAPTCHA_SECRET')
 
-ALLOWED_HOSTS = ['localhost']
-DEBUG = True
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+DEBUG = env.bool('DEBUG', default=True)
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
     }
+}
+
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}
 }
 
 DATABASES = {
@@ -42,11 +44,14 @@ DATABASES = {
         }
     }
 
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
 
 DOMAIN = "http://localhost:8000"
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
 STATICFILES_DIRS = [
      BASE_DIR / '../assets/'

@@ -1,0 +1,51 @@
+{% regroup friends by state as groups %}
+{% for group in groups %}
+<section class="pp-group" data-group="{{ group.grouper }}">
+    <h2 class="pp-group-title">
+        {% if group.grouper == "incoming" %}Friend requests{% elif group.grouper == "friends" %}Friends{% else %}Sent requests{% endif %}
+        <span class="pp-group-count">{{ group.list|length }}</span>
+    </h2>
+    <ul class="pp-rows">
+        {% for friend in group.list %}
+        <li class="pp-friend pp-friend-{{ friend.state }}" data-username="{{ friend.friend.username }}"
+            data-search="{{ friend.friend.name|lower }} {{ friend.friend.username|lower }}">
+            {% if friend.state == "incoming" %}
+            <a class="pp-friend-link" href="{% url 'chat:FriendRequest' %}?user={{ friend.friend.username|urlencode }}">
+            {% else %}
+            <a class="pp-friend-link" href="{% url 'chat:waiting-room' %}?user={{ friend.friend.username|urlencode }}">
+            {% endif %}
+                <span class="pp-avatar-wrap">
+                    <span class="pp-avatar" data-seed="{{ friend.friend.username }}" aria-hidden="true">{{ friend.friend.name|slice:":1"|upper }}</span>
+                    {% if friend.state == "friends" and friend.friend.online %}<span class="pp-online" title="Online"></span>{% endif %}
+                </span>
+                <span class="pp-friend-text">
+                    <span class="pp-friend-name">{{ friend.friend.name }}</span>
+                    <span class="pp-friend-username">
+                        {% if friend.state == "incoming" %}Wants to connect
+                        {% elif friend.state == "outgoing" %}Waiting for them to accept
+                        {% else %}@{{ friend.friend.username }}{% endif %}
+                    </span>
+                </span>
+                {% if friend.state == "incoming" %}<span class="pp-pill pp-pill-new">New</span>{% endif %}
+                <span class="pp-live" id="live_notification_{{ friend.friend.username }}"></span>
+            </a>
+            <button type="button" class="pp-row-action pp-delete-friend" data-username="{{ friend.friend.username }}"
+                title="{% if friend.state == 'friends' %}Remove {{ friend.friend.name }}{% else %}Cancel request{% endif %}"
+                aria-label="{% if friend.state == 'friends' %}Remove {{ friend.friend.name }}{% else %}Cancel request{% endif %}">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% empty %}
+<div class="pp-side-empty">
+    <div class="pp-side-empty-icon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></div>
+    <p><b>No friends yet</b></p>
+    <p>Add someone by username, or share your profile link with them.</p>
+    <button type="button" class="pp-side-empty-btn" data-toggle="modal" data-target="#AddFriend">
+        <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add a friend
+    </button>
+</div>
+{% endfor %}
+<p class="pp-side-nomatch" id="friend-nomatch" hidden>No friends match your search.</p>

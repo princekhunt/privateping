@@ -1,221 +1,276 @@
-from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
-from .models import UserProfile, Friends
-from django.views.decorators.csrf import csrf_exempt
+import json
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http.response import JsonResponse
-from rest_framework.parsers import JSONParser
-from channels.db import database_sync_to_async
-from chat.models import Keys
-import base64
-import urllib
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_safe, require_http_methods, require_POST
+
+from chat import cooldown
+from chat.models import Friends, Keys, UserProfile
+from chat.tools import are_friends, getFriendsList, notify_friends_changed, push_to_user
 from registration.models import user_type
-from chat.tools import getFriendsList, getUserId
-from django.views.decorators.clickjacking import xframe_options_exempt
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
+from registration.security import check_and_hit
 
 
+def _is_anonymous_account(user):
+    return user_type.objects.filter(user=user, type="Anonymous").exists()
+
+
+def _base_context(request, profile, **extra):
+    """Context shared by every page that extends chat/Base.html."""
+    context = {
+        "friends": getFriendsList(profile.id),
+        "anonymous": _is_anonymous_account(request.user),
+        "curr_user": profile,
+    }
+    context.update(extra)
+    return context
+
+
+def _profile_or_none(user):
+    return UserProfile.objects.filter(user=user).first()
+
+
+@login_required
+@require_safe
 def index(request):
-    """
-    Renders the chat index page. If the user is not authenticated, redirects to the registration home page.
-    If the user is anonymous, it renders the Base.html template with anonymous set to True.
-    Otherwise, it renders the Base.html template with the list of friends.
-    """
-    if not request.user.is_authenticated:
-        return redirect("registration:home")
-
-    username = request.user.username  # Get username of the logged-in user
-    id = getUserId(username)  # Get user ID based on the username
-    friends = getFriendsList(id)  # Get friends list for the user
-
-    # Check if the user type is anonymous
-    if user_type.objects.get(user=request.user).type == "Anonymous":
-        return render(request, "chat/Base.html", {'friends': friends, 'anonymous':True})
-
-    return render(request, "chat/Base.html", {'friends': friends})
+    """Dashboard: friend list + greeting."""
+    profile = _profile_or_none(request.user)
+    if profile is None:
+        return redirect("registration:logout")
+    return render(request, "chat/Base.html", _base_context(request, profile))
 
 
+@login_required
+@require_http_methods(["GET", "POST"])
 def addFriend(request, name):
     """
-    Adds a friend to the current user's friend list. If the note exceeds 100 characters, an alert is shown.
-    If the friend already exists or the user does not exist, it redirects to the dashboard.
-    Otherwise, it saves the new friend relationship.
+    Sends a friend request to the user `name`.
+    GET shows a confirmation page; only a POST (with a CSRF token) creates the request,
+    so a third-party page or link cannot make a user send friend requests silently.
     """
-    note = request.GET.get("note", "")
+    current_user = _profile_or_none(request.user)
+    friend = UserProfile.objects.filter(username=name).first()
+    if current_user is None:
+        return redirect("registration:logout")
+    if friend is None:
+        messages.error(request, "No user with that username exists.")
+        return redirect("chat:dashboard")
+    if friend.pk == current_user.pk:
+        messages.info(request, "You can't add yourself as a friend.")
+        return redirect("chat:dashboard")
+
+    source = request.POST if request.method == "POST" else request.GET
+    note = source.get("note", "").strip()
     if len(note) > 100:
-        return HttpResponse(
-            "<script>alert('Note too long!'); window.location.href='/dashboard';</script>"
-        )
+        messages.error(request, "The note can be at most 100 characters.")
+        return redirect("chat:dashboard")
 
-    friend = get_object_or_404(UserProfile, username=name)
-    current_user = get_object_or_404(UserProfile, username=request.user.username)
+    if Friends.objects.filter(user=current_user, friend=friend).exists() or \
+            Friends.objects.filter(user=friend, friend=current_user).exists():
+        if are_friends(current_user, friend):
+            messages.info(request, f"You and {friend.username} are already friends.")
+        else:
+            messages.info(request, f"A friend request between you and {friend.username} is already pending.")
+        return redirect("chat:dashboard")
 
-    if Friends.objects.filter(user=current_user, friend=friend).exists():
-        return redirect("/dashboard")
+    wait = cooldown.remaining("friend", current_user.username, friend.username)
+    if wait:
+        messages.warning(request, f"{friend.username} declined your last request. "
+                                  f"You can send another one in {cooldown.humanize(wait)}.")
+        return redirect("chat:dashboard")
 
-    # Create a new friend relationship for the user
+    if request.method != "POST":
+        return render(request, "chat/AddFriendConfirm.html",
+                      _base_context(request, current_user, target=friend, note=note))
+
+    if check_and_hit("friend-request", current_user.pk, limit=20, window=3600):
+        messages.error(request, "You're sending friend requests too quickly. Please try again later.")
+        return redirect("chat:dashboard")
+
+    # The sender's side is accepted; the receiver has to accept explicitly.
     Friends.objects.create(user=current_user, friend=friend, accepted=True)
-
-    # Create a new friend relationship for the friend
     Friends.objects.create(user=friend, friend=current_user, note=note, accepted=False)
+    notify_friends_changed(friend.username, "request", current_user.username)
 
-    return redirect("/dashboard")
+    messages.success(request, f"Friend request sent to {friend.username}.")
+    return redirect("chat:dashboard")
 
-@xframe_options_exempt
+
+@login_required
+@require_safe
 def chat(request, username):
     """
-    Renders the chat page with the specified user. If the user is not found, it redirects to the dashboard.
-    It also sets a cookie with the friend's public key.
+    Chat page with `username`. Only mutually accepted friends can open it, and only
+    then is the friend's public key handed out.
     """
-    try:
-        friend = UserProfile.objects.get(username=username)  # Get the friend's UserProfile
-    except UserProfile.DoesNotExist:
+    curr_user = _profile_or_none(request.user)
+    friend = UserProfile.objects.filter(username=username).first()
+    if curr_user is None or friend is None or not are_friends(curr_user, friend):
+        messages.error(request, "You can only chat with friends who accepted your request.")
         return redirect("chat:dashboard")
-    id = getUserId(request.user.username)  # Get the current user's ID
-    curr_user = UserProfile.objects.get(id=id)  # Get the current user's UserProfile
 
-    #messages = Messages.objects.filter(sender_name=id, receiver_name=friend.id) | Messages.objects.filter(sender_name=friend.id, receiver_name=id)
-    public_key = Keys.objects.get(user=friend).public_key  # Get the friend's public key
-    public_key = base64.b64encode(public_key.encode('utf-8')).decode('utf-8')# encode the public key
-    public_key = urllib.parse.quote_plus(public_key)  # URL encode the public key
-    friends = getFriendsList(id)  # Get the friends list for the current user
+    key = Keys.objects.filter(user=friend).first()
+    if key is None or not key.public_key or not key.signing_key:
+        messages.warning(request, f"{friend.username} needs to log in again before you can chat securely.")
+        return redirect("chat:dashboard")
 
-    # Check if the user type is anonymous
-    if user_type.objects.get(user=request.user).type == "Anonymous":
-        response = render(request, "chat/messages.html",
-                        {
-                         'curr_user': curr_user, 'friends': friends, 'friend':friend, 'anonymous':True})
-        response.set_cookie('public_key', public_key)  # Set the public key in a cookie
-        return response
-
-
-    if request.method == "GET":
-        response = render(request, "chat/messages.html",
-                      {
-                       'friends': friends,
-                       'curr_user': curr_user, 'friend': friend})
-        response.set_cookie('public_key', public_key)  # Set the public key in a cookie
-        return response
-
-@xframe_options_exempt
-def waiting_room(request):
-    """
-    Renders the waiting room page where users can wait for their friends to join the chat.
-    If the user is not authenticated, it redirects to the home page.
-    It checks if the friend request is accepted before allowing the user to chat.
-    """
-    if not request.user.is_authenticated:
-        return redirect('/')
     try:
+        friend_keys = {"enc": json.loads(key.public_key), "sig": json.loads(key.signing_key)}
+    except json.JSONDecodeError:
+        messages.error(request, "Your friend's encryption keys are invalid. Ask them to log in again.")
+        return redirect("chat:dashboard")
 
-        if request.method == 'GET':
-            user = request.GET.get('user')  # Get the username of the friend from the request
-            curr_user = UserProfile.objects.get(username=request.user.username)  # Get the current user's UserProfile
-            friend = UserProfile.objects.get(username=user)  # Get the friend's UserProfile
+    cooldown.clear("chat", curr_user.username, friend.username)
 
-            # Check if the friend request is not accepted
-            if Friends.objects.filter(user=curr_user.id, friend=friend).exists():
-                if Friends.objects.get(user=curr_user.id, friend=friend).accepted == False:
-                    #redirect with get parameter
-                    return redirect(f"/request?user={user}")
+    my_keys = None
+    mine = Keys.objects.filter(user=curr_user).first()
+    if mine is not None and mine.public_key and mine.signing_key:
+        try:
+            my_keys = {"enc": json.loads(mine.public_key), "sig": json.loads(mine.signing_key)}
+        except json.JSONDecodeError:
+            my_keys = None
 
-            # Check if the friend request is not accepted by the friend
-            if Friends.objects.filter(user=friend, friend=curr_user.id).exists():
-                if Friends.objects.get(user=friend, friend=curr_user.id).accepted == False:
-                    return HttpResponse("<script>alert('You cannot chat with this user until, they accept your friend request!'); window.location.href='/';</script>")
+    return render(request, "chat/messages.html",
+                  _base_context(request, curr_user, friend=friend, friend_keys=friend_keys, my_keys=my_keys))
 
-            # Check if the friend relationship does not exist
-            if not Friends.objects.filter(user=curr_user.id, friend=friend).exists() or not Friends.objects.filter(user=friend, friend=curr_user.id).exists():
-                return HttpResponse("<script>alert('You cannot chat with this user until, they add you as a friend!'); window.location.href='/';</script>")
 
-        username = request.user.username  # Get the username of the current user
-        id = getUserId(username)  # Get the current user's ID
-        friends = getFriendsList(id)  # Get the friends list for the current user
+@login_required
+@require_safe
+def waiting_room(request):
+    """Waiting room shown until the friend opens the chat with the current user."""
+    curr_user = _profile_or_none(request.user)
+    friend = UserProfile.objects.filter(username=request.GET.get("user", "")).first()
+    if curr_user is None or friend is None:
+        messages.error(request, "That user doesn't exist.")
+        return redirect("chat:dashboard")
 
-        return render(request, "chat/waiting_room.html", {"friend": friend.name, 'friends': friends})
-    except:
-        return HttpResponse("<script>alert('something went wrong'); window.location.href='/';</script>")
-    
-@xframe_options_exempt
+    mine = Friends.objects.filter(user=curr_user, friend=friend).first()
+    theirs = Friends.objects.filter(user=friend, friend=curr_user).first()
+
+    if mine is None or theirs is None:
+        messages.error(request, f"You can't chat with {friend.username} until you are friends.")
+        return redirect("chat:dashboard")
+    if not mine.accepted:
+        # They sent us a request we haven't answered yet.
+        return redirect(f"/request?user={friend.username}")
+    if not theirs.accepted:
+        messages.info(request, f"You can chat with {friend.username} once they accept your friend request.")
+        return redirect("chat:dashboard")
+
+    wait = cooldown.remaining("chat", curr_user.username, friend.username)
+    if wait and friend.online_for_id != curr_user.pk:  # fine if *they* are waiting for us
+        messages.warning(request, f"{friend.username} declined your chat request. "
+                                  f"You can try again in {cooldown.humanize(wait)}.")
+        return redirect("chat:dashboard")
+
+    return render(request, "chat/waiting_room.html", _base_context(request, curr_user, friend=friend))
+
+
+@login_required
+@require_POST
+def decline_chat(request):
+    """
+    The current user declines a friend who is waiting for them in the waiting room.
+    The friend is told immediately and has to wait a progressively longer
+    cool-down before asking again.
+    """
+    me = _profile_or_none(request.user)
+    other = UserProfile.objects.filter(username=request.POST.get("user", "")).first()
+    if me is None or other is None or not are_friends(me, other):
+        return JsonResponse({"status": False}, status=404)
+    if other.online_for_id != me.pk:
+        return JsonResponse({"status": False, "message": "They are no longer waiting."})
+
+    wait = cooldown.record_decline("chat", other.username, me.username)
+    UserProfile.objects.filter(pk=other.pk, online_for=me).update(online_for=None)
+    push_to_user(other.username, {"type": "chat_declined", "from": me.username,
+                                  "retry_in": wait, "retry_text": cooldown.humanize(wait)})
+    return JsonResponse({"status": True, "retry_in": wait})
+
+
+@require_safe
 def room(request):
-    """
-    Checks if the specified user is online and available for chat.
-    Returns a JSON response indicating the online status.
-    """
-    if request.method == "GET":
-        ForUser = request.GET.get("user")  # Get the username of the friend from the request
-        try:
-            # Check if the friend is online and available for chat
-            if UserProfile.objects.get(username=str(ForUser)).online==1 and UserProfile.objects.get(username=str(ForUser)).online_for==UserProfile.objects.get(username=request.user.username):
-                return JsonResponse({"status": True})
-            else:
-                return JsonResponse({"status": False})
-        except Exception as e:
-            pass
+    """Returns whether the friend `user` is online and has opened a chat with us."""
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": False}, status=401)
+    for_user = request.GET.get("user", "")
+    me = _profile_or_none(request.user)
+    other = UserProfile.objects.filter(username=for_user).first()
+    if me is None or other is None or not are_friends(me, other):
         return JsonResponse({"status": False})
-    return JsonResponse({"status": False})
+    return JsonResponse({"status": other.online == 1 and other.online_for_id == me.pk})
 
+
+@login_required
+@require_http_methods(["GET", "POST"])
 def FriendRequest(request):
-    """
-    Handles the friend request process. If the request method is GET, it renders the friend request page.
-    If the request method is POST, it accepts or rejects the friend request based on the user's action.
-    """
-    if not request.user.is_authenticated:
-        return redirect('registration:login')
-    
+    """GET shows a pending friend request; POST accepts or rejects it."""
+    me = _profile_or_none(request.user)
+    if me is None:
+        return redirect("registration:logout")
+
+    source = request.POST if request.method == "POST" else request.GET
+    other_name = source.get("request_from") or source.get("user")
+    other = UserProfile.objects.filter(username=other_name or "").first()
+    pending = None
+    if other is not None:
+        pending = Friends.objects.filter(user=me, friend=other, accepted=False).first()
+    if pending is None:
+        if other is not None and are_friends(me, other):
+            return redirect(f"/waiting-room?user={other.username}")
+        messages.error(request, "That friend request doesn't exist anymore.")
+        if request.method == "POST":
+            return JsonResponse({"status": False}, status=404)
+        return redirect("chat:dashboard")
+
     if request.method == "GET":
-        if not request.GET.get("user"):
-            return redirect("chat:dashboard")
-    
-        friend = request.GET.get("user")  # Get the username of the friend from the request
-        try:
-            # Check if the friend request exists
-            if Friends.objects.filter(user=UserProfile.objects.get(user=request.user), friend=UserProfile.objects.get(user=User.objects.get(username=friend))).exists():
-                note = Friends.objects.get(user=UserProfile.objects.get(user=request.user), friend=UserProfile.objects.get(user=User.objects.get(username=friend))).note
+        return render(request, "chat/FriendRequest.html",
+                      _base_context(request, me, RequestFrom=other.username, note=pending.note))
 
-                username = request.user.username  # Get the username of the current user
-                id = getUserId(username)  # Get the current user's ID
-                friends = getFriendsList(id)  # Get the friends list for the current user
+    action = request.POST.get("action")
+    if action == "accept":
+        Friends.objects.filter(user=me, friend=other).update(accepted=True)
+        Friends.objects.filter(user=other, friend=me).update(accepted=True)
+        cooldown.clear("friend", me.username, other.username)
+        notify_friends_changed(other.username, "accepted", me.username)
+        messages.success(request, f"You and {other.username} are now friends.")
+        return JsonResponse({"status": True})
+    if action == "reject":
+        Friends.objects.filter(user=me, friend=other).delete()
+        Friends.objects.filter(user=other, friend=me).delete()
+        wait = cooldown.record_decline("friend", other.username, me.username)
+        notify_friends_changed(other.username, "rejected", me.username,
+                               retry_in=wait, retry_text=cooldown.humanize(wait))
+        messages.info(request, f"Friend request from {other.username} rejected.")
+        return JsonResponse({"status": True})
+    return JsonResponse({"status": False}, status=400)
 
-                return render(request, "chat/FriendRequest.html", {"RequestFrom": friend, "note": note, 'friends': friends})
-        except ObjectDoesNotExist:
-            return redirect("chat:dashboard")
-        
-    if request.method == "POST":
-        request_from = request.POST.get("request_from")  # Get the username of the friend from the request
-        #validations
-        if Friends.objects.filter(user=UserProfile.objects.get(user=request.user), friend=UserProfile.objects.get(user=User.objects.get(username=request_from))).exists():
-            action = request.POST.get("action")  # Get the action (accept/reject) from the request
-            if action == "accept":
-                friend = UserProfile.objects.get(user=User.objects.get(username=request_from))  # Get the friend's UserProfile
-                Friends.objects.filter(user=UserProfile.objects.get(user=request.user), friend=friend).update(accepted=True) # Accept the friend request
-                Friends.objects.filter(user=friend, friend=UserProfile.objects.get(user=request.user)).update(accepted=True)  # Update the friend request status
-                return redirect("chat:dashboard")
-            elif action == "reject":
-                friend = UserProfile.objects.get(user=User.objects.get(username=request_from))  # Get the friend's UserProfile
-                Friends.objects.filter(user=UserProfile.objects.get(user=request.user), friend=friend).delete()  # Delete the friend request
-                Friends.objects.filter(user=friend, friend=UserProfile.objects.get(user=request.user)).delete()  # Delete the friend request from the friend's side
-                return redirect("chat:dashboard")
 
-    return render(request, "chat/FriendRequest.html")
+@login_required
+@require_safe
+def friends_partial(request):
+    """HTML fragment of the sidebar friend list (used to refresh it live)."""
+    profile = _profile_or_none(request.user)
+    if profile is None:
+        return JsonResponse({"status": False}, status=400)
+    return render(request, "chat/_friends.html", {"friends": getFriendsList(profile.id)})
 
+
+@login_required
+@require_POST
 def deleteFriend(request):
-    """
-    Deletes a friend from the current user's friend list.
-    If the user is not authenticated, it redirects to the login page.
-    If the friend exists, it deletes the friend relationship.
-    """
-    if not request.user.is_authenticated:
-        return redirect("registration:login")
-    
-    if request.method == "GET":
-        friend = request.GET.get("friend")  # Get the username of the friend from the request
-        try:
-            # Check if the friend relationship exists
-            if Friends.objects.filter(user=UserProfile.objects.get(user=request.user), friend=UserProfile.objects.get(user=User.objects.get(username=friend))).exists():
-                friend = UserProfile.objects.get(user=User.objects.get(username=friend))  # Get the friend's UserProfile
-                Friends.objects.filter(user=UserProfile.objects.get(user=request.user), friend=friend).delete()  # Delete the friend relationship
-                Friends.objects.filter(user=friend, friend=UserProfile.objects.get(user=request.user)).delete()  # Delete the friend relationship from the friend's side
-                return JsonResponse({"status": True, "message": "Friend deleted successfully!"})
-        except ObjectDoesNotExist:
-            return redirect("chat:dashboard")
-    return redirect("chat:dashboard")
+    """Removes a friend (both directions)."""
+    me = _profile_or_none(request.user)
+    friend = UserProfile.objects.filter(username=request.POST.get("friend", "")).first()
+    if me is None or friend is None or not Friends.objects.filter(user=me, friend=friend).exists():
+        return JsonResponse({"status": False, "message": "Friend not found."}, status=404)
+
+    Friends.objects.filter(user=me, friend=friend).delete()
+    Friends.objects.filter(user=friend, friend=me).delete()
+    # Make sure neither side keeps a stale "waiting for" pointer.
+    UserProfile.objects.filter(pk=me.pk, online_for=friend).update(online_for=None)
+    UserProfile.objects.filter(pk=friend.pk, online_for=me).update(online_for=None)
+    notify_friends_changed(friend.username, "removed", me.username)
+    return JsonResponse({"status": True, "message": "Friend deleted successfully!"})

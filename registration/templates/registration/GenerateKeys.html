@@ -6,13 +6,17 @@
 <title>PrivatePing - Securing Session</title>
 </head>
 
-<body>
+<body data-title="PrivatePing - Securing Session">
+  {% csrf_token %}
   <div id="login-container">
     <div id="login-form">
       <span class="loader"></span>
-      <h1 id="processing">Generating Secure Keypair...</h1>
+      <h1 id="processing">Generating secure keys…</h1>
+      <p id="keys-error" class="pp-form-errors" hidden role="alert"></p>
+      <a id="keys-retry" class="btn btn-light" href="" hidden>Try again</a>
     </div>
   </div>
+    <script src="{% static 'js/crypto.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/registration/GenerateKeys.js' %}"></script>
 
 {% endblock %}

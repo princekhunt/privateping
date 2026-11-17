@@ -1,0 +1,20 @@
+{% extends "registration/Base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/registration/GenerateKeys.css' %}">
+<title>PrivatePing - Log out</title>
+</head>
+
+<body data-title="PrivatePing - Log out">
+  <div id="login-container">
+    <div id="login-form">
+      <h1 id="processing">Log out of PrivatePing?</h1>
+      <form method="post" action="{% url 'registration:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-light btn-lg">Log out</button>
+        <a class="btn btn-outline-light btn-lg" href="{% url 'chat:dashboard' %}">Cancel</a>
+      </form>
+    </div>
+  </div>
+{% endblock %}

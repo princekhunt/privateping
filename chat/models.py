@@ -33,7 +33,8 @@ class Friends(models.Model):
 class Keys(models.Model):
     id = models.AutoField(primary_key=True, unique=True, editable=False, blank=True)
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    public_key = models.TextField()
+    public_key = models.TextField()  # RSA-OAEP public key (JWK, JSON) used to encrypt messages
+    signing_key = models.TextField(blank=True, default="")  # ECDSA P-256 public key (JWK, JSON) used to verify messages
     
     class Meta:
         verbose_name_plural = "Keys"

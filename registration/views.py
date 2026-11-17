@@ -1,353 +1,262 @@
-from django.shortcuts import render, redirect
-from registration.forms import SignUpForm, CustomSignupForm
-from django.contrib.auth import login, authenticate, logout
-from chat.models import UserProfile, Keys, Friends
-from django.http import JsonResponse, HttpResponse
-from registration.models import facts, user_type
-from registration.tools import generate_username
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from PrivatePing.settings import DOMAIN
-import random
-# csrf
-from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_safe, require_http_methods
 
-domain = DOMAIN
+from chat.models import Friends, Keys, UserProfile
+from registration import pow as proof_of_work
+from registration.forms import SignUpForm, username_validator
+from registration.models import facts, user_type
+from registration.security import (InvalidKey, check_and_hit, clean_encryption_jwk,
+                                   clean_signing_jwk, client_ip, is_rate_limited, reset)
+from registration.tools import generate_username
+
+# Brute-force protection for the login form
+LOGIN_LIMIT_PER_USER = 5      # failed attempts per username ...
+LOGIN_LIMIT_PER_IP = 20       # ... or per IP ...
+LOGIN_WINDOW = 15 * 60        # ... within 15 minutes
 
 
+def _random_fact():
+    return facts.objects.order_by('?').first()
+
+
+@require_safe
 def Home(request):
-    """
-    The Home function handles the initial landing page logic.
-    It includes several key steps:
-
-    1. Checks if the user is authenticated; if yes, redirects to the chat dashboard.
-    2. Fetches a random fact from the database to display on the home page.
-    3. Renders the home page with the fetched fact for GET requests.
-
-    """
+    """Landing page. Logged in users go straight to the dashboard."""
     if request.user.is_authenticated:
         return redirect('chat:dashboard')
-
-    fact = facts.objects.order_by('?').first()
-    # facts are rendered below the 'Do you know? from the Home.html'
-    return render(request, "registration/Home.html", {"fact": fact})
+    return render(request, "registration/Home.html", {"fact": _random_fact()})
 
 
-# Skip the csrf verification
-@csrf_exempt
+@never_cache
+@require_http_methods(["GET", "POST"])
 def Login(request):
     """
-    The Login function handles the process of user authentication and login.
-    It includes several key steps:
-
-    1. Checks if the user is already authenticated; if yes, redirects to the chat dashboard.
-    2. Fetches a random fact from the database to display on the login page.
-    3. Handles POST requests for form submissions and constructs variations of the host URL 
-       (with "https://" and "http://") to handle requests without the protocol specified.
-    4. Validates the request host and redirects to an error page if it's invalid.
-    5. Authenticates the user by fetching the username and password from the request.
-    6. Logs the user in if the credentials are valid and redirects to the key generation page.
-    7. Renders the login page with an error message if the credentials are invalid.
-    8. Renders the login page with a random fact for GET requests.
-
+    Username/password login with per-user and per-IP throttling.
+    After logging in the browser generates a fresh E2EE key pair (GenerateKeys).
     """
     if request.user.is_authenticated:
         return redirect('chat:dashboard')
 
-    fact = facts.objects.order_by('?').first()
+    context = {"fact": _random_fact()}
     if request.method == "POST":
-        curr_host = request.META.get("HTTP_HOST")
-        if not curr_host.startswith("http"):
-            curr_host1 = "https://" + curr_host
-            curr_host2 = "http://" + curr_host
-        if curr_host1 != domain and curr_host2 != domain:
-            return HttpResponse("<script>alert('Invalid Request!'); window.location.href='/login';</script>")
-        '''
-        Authenticates after fetching the username and the password and logs the user in
-        Else in case of invalid credentials login page is rendered with the error
-        '''
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(username=username, password=password)
+        username = (request.POST.get("username") or "").strip()
+        password = request.POST.get("password") or ""
+        ip = client_ip(request)
+        user_key = username.lower()
+
+        if is_rate_limited("login-user", user_key, LOGIN_LIMIT_PER_USER, LOGIN_WINDOW) or \
+                is_rate_limited("login-ip", ip, LOGIN_LIMIT_PER_IP, LOGIN_WINDOW):
+            context["error"] = "Too many failed attempts. Please wait 15 minutes and try again."
+            return render(request, "registration/Login.html", context, status=429)
+
+        user = authenticate(request, username=username, password=password) if username and password else None
+        # Anonymous accounts have no usable password, so they can never log in here.
         if user is not None:
+            reset("login-user", user_key)
             login(request, user)
             return redirect("registration:generate_keys")
-        else:
-            error_message = "Invalid credentials!"
-            return render(request, "registration/Login.html", {"error": error_message, "fact": fact})
 
-    return render(request, "registration/Login.html", {"fact": fact})
+        check_and_hit("login-user", user_key, LOGIN_LIMIT_PER_USER, LOGIN_WINDOW)
+        check_and_hit("login-ip", ip, LOGIN_LIMIT_PER_IP, LOGIN_WINDOW)
+        context["error"] = "Invalid username or password."
+        context["username"] = username
+        return render(request, "registration/Login.html", context, status=401)
+
+    return render(request, "registration/Login.html", context)
 
 
+@never_cache
+@require_http_methods(["GET", "POST"])
 def GenerateKeys(request):
     """
-    The GenerateKeys function handles the process of generating and updating keys for end-to-end encryption.
-    It includes several key steps:
-    
-    1. Check whether the user is authenticated or not.
-    2. If authenticated, retrieve the user profile and fetch the E2EE key.
-    3. Update the key if it already exists; otherwise, store it in the database.
-    4. After POST processing, redirect to Dashboard by constructing the absolute URL.
+    GET: page that generates the key pairs in the browser.
+    POST: stores the user's *public* encryption and signing keys after strict validation.
+    The private keys never leave the browser (they are non-extractable WebCrypto keys).
     """
     if not request.user.is_authenticated:
+        if request.method == "POST":
+            return JsonResponse({"status": "error", "message": "Not logged in."}, status=401)
         return redirect('registration:login')
+
     if request.method == "POST":
-        user = UserProfile.objects.get(user=request.user)
-        public_key = request.POST.get("public_key")
-        if Keys.objects.filter(user=user).exists():
-            key = Keys.objects.get(user=user)
-            key.public_key = public_key
-            key.save()
-        else:
-            SaveKeys = Keys(user=user, public_key=public_key)
-            SaveKeys.save()
-        return JsonResponse({"redirect": request.build_absolute_uri("/dashboard")})
+        user = UserProfile.objects.filter(user=request.user).first()
+        if user is None:
+            return JsonResponse({"status": "error", "message": "Profile missing."}, status=400)
+        try:
+            public_key = clean_encryption_jwk(request.POST.get("public_key"))
+            signing_key = clean_signing_jwk(request.POST.get("signing_key"))
+        except InvalidKey as exc:
+            return JsonResponse({"status": "error", "message": f"Invalid key: {exc}"}, status=400)
+
+        Keys.objects.update_or_create(user=user, defaults={"public_key": public_key,
+                                                           "signing_key": signing_key})
+        # Keep at most one Keys row per user (older versions could create duplicates).
+        extra = Keys.objects.filter(user=user).order_by("-id")[1:]
+        Keys.objects.filter(pk__in=[k.pk for k in extra]).delete()
+        return JsonResponse({"status": "ok", "redirect": "/dashboard"})
 
     return render(request, "registration/GenerateKeys.html")
 
 
+def _destroy_anonymous_account(user):
+    profile = UserProfile.objects.filter(user=user).first()
+    if profile is not None:
+        Friends.objects.filter(user=profile).delete()
+        Friends.objects.filter(friend=profile).delete()
+        profile.delete()
+    user_type.objects.filter(user=user).delete()
+    user.delete()
+
+
+@never_cache
+@require_http_methods(["GET", "POST"])
 def Logout(request):
     """
-    The Logout function handles the process of logging out a user from the system.
-    It includes several key steps:
-
-    1. Checks if the user is authenticated; if not, redirects to the login page.
-    2. If authenticated, retrieve the user's profile and update their status to offline.
-    3. Updates any friends' profiles that reference the current user's profile.
-    4. Clears the user's public key if it exists.
-    5. If the user is of type 'Anonymous', delete associated friends, user type, 
-       user profile, and the user account itself.
-    6. Logs out the user, ending their session.
-    7. Clears local storage and relevant cookies from the user's browser.
-    8. Redirect the user to the home page.
+    POST logs out (GET only shows a confirmation, so other sites can't log users out).
+    Public keys are wiped server side; the logged_out page wipes private keys in the browser.
+    Anonymous accounts are deleted completely.
     """
+    if request.method == "GET":
+        if not request.user.is_authenticated:
+            return render(request, "registration/LoggedOut.html")
+        return render(request, "registration/Logout.html")
 
-    # Check if the user is authenticated; if not, redirect to the login page
-    if not request.user.is_authenticated:
-        return redirect('registration:login')
-
-    # Proceed if the user is authenticated
     if request.user.is_authenticated:
-        # Retrieve the user's profile
-        user_profile = UserProfile.objects.get(user=request.user)
-        # Set the user profile's online status to offline (0) and clear the 'online_for' field
-        user_profile.online = 0
-        user_profile.online_for = None
-        # Check if there are any users whose 'online_for' field references the current user's profile
-        if UserProfile.objects.filter(online_for=user_profile).exists():
-            # Retrieve and update such user profiles to set 'online_for' to None
-            friends_profile = UserProfile.objects.filter(online_for=user_profile)
-            friends_profile.update(online_for=None)
-        # Save the updated user profile to the database
-        user_profile.save()
+        user = request.user
+        with transaction.atomic():
+            profile = UserProfile.objects.filter(user=user).first()
+            if profile is not None:
+                UserProfile.objects.filter(online_for=profile).update(online_for=None)
+                profile.online = 0
+                profile.online_for = None
+                profile.save(update_fields=["online", "online_for"])
+                Keys.objects.filter(user=profile).update(public_key="", signing_key="")
 
-        # Check if the user has any associated public keys
-        if Keys.objects.filter(user=user_profile).exists():
-            # Retrieve the Keys object, clear the public key, and save the changes
-            key = Keys.objects.get(user=user_profile)
-            key.public_key = ""
-            key.save()
+            anonymous = user_type.objects.filter(user=user, type="Anonymous").exists()
+            logout(request)
+            if anonymous:
+                _destroy_anonymous_account(user)
 
-        # Check if the user is of type 'Anonymous'
-        if user_type.objects.filter(user=request.user, type="Anonymous").exists():
-            # If the user has any friends, delete those Friend objects
-            if Friends.objects.filter(user=user_profile).exists():
-                friends = Friends.objects.filter(user=user_profile)
-                friends.delete()
-                Friends.objects.filter(friend=user_profile).delete()
-            # Delete the 'Anonymous' user type object
-            user_type.objects.get(user=request.user, type="Anonymous").delete()
-            # Delete the user's profile and the user account itself
-            user_profile.delete()
-            request.user.delete()
-
-        # Log the user out, ending their session
-        logout(request)
-
-    # Create a response that clears local storage and redirects to the home page
-    response = HttpResponse("<script>localStorage.clear();parent.location.href = '/';</script>")
-    # Delete cookies related to notifications and public key
+    response = render(request, "registration/LoggedOut.html")
     response.delete_cookie("notified")
     response.delete_cookie("Anotified")
     response.delete_cookie("public_key")
-    # Return the response to the client
     return response
 
 
-@csrf_exempt
+@never_cache
+@require_http_methods(["GET", "POST"])
 def Signup(request):
-    """
-    The Signup function handles user registration for the system.
-    It includes several key steps:
-
-    1. Checks if the user is already authenticated; if so, redirects to the dashboard.
-    2. Retrieves a random fact to display on the signup page.
-    3. Processes the POST request to create a new user:
-        a. Verifies the request's host.
-        b. Copies and modifies the POST data to include a dummy email address.
-        c. Validates the signup form.
-        d. If valid, saves the new user and associated profile and user type.
-        e. If invalid, returns an error message.
-    4. Renders the signup page with a random fact if the request method is not POST.
-    """
-
-    # Check if the user is authenticated; if so, redirect to the dashboard
+    """Account registration with server-side validation and per-IP throttling."""
     if request.user.is_authenticated:
         return redirect('chat:dashboard')
 
-    # Retrieve a random fact to display on the signup page
-    fact = facts.objects.order_by('?').first()
-
-    # Process the POST request to create a new user
+    context = {"fact": _random_fact()}
     if request.method == "POST":
-        # Get the current host
-        curr_host = request.META.get("HTTP_HOST")
-        # Ensure the host starts with "http"
-        if not curr_host.startswith("http"):
-            curr_host1 = "https://" + curr_host
-            curr_host2 = "http://" + curr_host
-        # Check if the host matches the domain
-        if curr_host1 != domain and curr_host2 != domain:
-            return HttpResponse("<script>alert('Invalid Request!'); window.location.href='/login';</script>")
-        # Copy the POST data and modify the email field
+        if check_and_hit("signup-ip", client_ip(request), limit=10, window=3600):
+            context["errors"] = ["Too many sign-ups from your network. Please try again later."]
+            return render(request, "registration/Signup.html", context, status=429)
+
         data = request.POST.copy()
-        data["email"] = data["username"] + "@noemailrequired.com"
-        email = data["email"]
-        request.POST = data
-        # Create the signup form with the modified POST data
-        form = SignUpForm(request.POST)
+        data["email"] = (data.get("username") or "user") + "@noemailrequired.com"
+        form = SignUpForm(data)
 
-        # Validate the form
         if form.is_valid():
-            # Get the form data
-            name = form.cleaned_data.get('name')
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get("password1")
-            # Save the new user
-            user = form.save()
-            # Create and save the user's profile
-            profile = UserProfile(user=user, name=name, username=username)
-            profile.save()
-            # Create and save the user type
-            user_type_obj = user_type(user=user, type="regular")
-            user_type_obj.save()
-            # Redirect to the login page
+            with transaction.atomic():
+                user = form.save()
+                UserProfile.objects.create(user=user, name=form.cleaned_data["name"],
+                                           username=form.cleaned_data["username"])
+                user_type.objects.create(user=user, type="regular")
+            messages.success(request, "Account created! Please log in.")
             return redirect("registration:login")
-        else:
-            # If the form is invalid, return an error message
-            return HttpResponse(
-                "<script>alert('Please enter valid details!'); window.location.href='/signup';</script>")
-    # Render the signup page with a random fact if the request method is not POST
-    return render(request, "registration/Signup.html", {"fact": fact})
+
+        context["errors"] = [e for errs in form.errors.values() for e in errs]
+        context["name"] = data.get("name", "")
+        context["username"] = data.get("username", "")
+        return render(request, "registration/Signup.html", context, status=400)
+
+    return render(request, "registration/Signup.html", context)
 
 
+@require_safe
 def UsernameCheck(request):
-    """
-    The UsernameCheck function handles AJAX requests to check if a username is available.
-    It includes several key steps:
+    """AJAX: is a username free / valid? Throttled to make enumeration expensive."""
+    if check_and_hit("username-check", client_ip(request), limit=120, window=60):
+        return JsonResponse({"status": "error", "message": "Too many requests."}, status=429)
 
-    1. Processes the GET request to check username availability.
-    2. Checks if the username exists in the database.
-    3. If the username exists, checks if the current authenticated user is the owner of the username.
-    4. Returns a JSON response indicating the availability of the username.
-    """
-
-    # Process the GET request to check username availability
-    if request.method == "GET":
-        username = request.GET.get("username")
-        user_self = False
-
-        # Check if the username exists in the database
-        if UserProfile.objects.filter(username=username).exists():
-            # If the user is authenticated, check if they own the username
-            if request.user.is_authenticated:
-                if request.user.username == username:
-                    user_self = True
-            # Return a JSON response indicating the username is taken
-            return JsonResponse({
-                "status": "ok",
-                "available": False,
-                "self": user_self
-            })
-        else:
-            # Return a JSON response indicating the username is available
-            return JsonResponse({
-                "status": "ok",
-                "available": True,
-                "self": user_self
-            })
-
-    # Return a JSON response indicating an error if the request method is not GET
+    username = request.GET.get("username", "")
+    valid = True
+    try:
+        username_validator(username)
+    except Exception:
+        valid = False
+    exists = UserProfile.objects.filter(username=username).exists()
+    user_self = bool(exists and request.user.is_authenticated and request.user.username == username)
     return JsonResponse({
-        "status": "error",
-        "available": False
+        "status": "ok",
+        "available": not exists and valid and 5 <= len(username) <= 20,
+        "valid": valid,
+        "exists": exists,
+        "self": user_self,
     })
 
 
+@never_cache
+@require_http_methods(["GET", "POST"])
 def AnonymousDirectLogin(request):
     """
-    The AnonymousDirectLogin function handles anonymous user login for the system.
-    It includes several key steps:
-    1. Checks if the user is already authenticated; if so, redirects to the dashboard.
-    2. Processes the POST request to create an anonymous user:
-        a. Generates a random username.
-        b. Create a random password.
-        c. Creates the anonymous user with a dummy email address.
-        d. Saves the user and their profile.
-        e. Authenticates and logs in the new anonymous user.
-        f. Returns a JSON response with a redirect to the generate keys page.
-    3. Renders the anonymous direct login page if the request method is not POST.
+    Creates a temporary account (deleted on logout or after 24h).
+    Bots are kept out by a privacy-friendly proof-of-work check (registration/pow.py)
+    plus a honeypot field and per-IP limits - no third-party CAPTCHA.
     """
-
-    # Check if the user is authenticated; if so, redirect to the dashboard
     if request.user.is_authenticated:
         return redirect('chat:dashboard')
 
-    # Process the POST request to create an anonymous user
+    ip = client_ip(request)
     if request.method == "POST":
-        form = CustomSignupForm(request.POST)
+        if is_rate_limited("anon-ip", ip, limit=10, window=3600):
+            return JsonResponse({"status": "error", "message": "Too many temporary accounts from your network. "
+                                                                "Please try again later."}, status=429)
+        if request.POST.get("website"):  # honeypot: invisible to people, filled in by naive bots
+            return JsonResponse({"status": "error", "message": "Verification failed."}, status=400)
+        try:
+            proof_of_work.verify(request.POST.get("challenge"), request.POST.get("nonce"))
+        except proof_of_work.InvalidSolution as exc:
+            expired = str(exc) in ("expired", "already used")
+            return JsonResponse({"status": "error", "retry": expired,
+                                 "message": "Verification expired - retrying." if expired else "Verification failed."},
+                                status=400)
+        check_and_hit("anon-ip", ip, limit=10, window=3600)
+        proof_of_work.record_success(ip)
 
-        if form.is_valid():
-            # Get the action from the POST request
-            action = request.POST.get("action")
-            # If the action is to create a new anonymous user
-            if action == "create":
-                # Generate a random username
-                username = generate_username()
-                name = username
-                # Create a random password
-                password = ''.join(random.choices("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", k=8))
-                # Create a dummy email address
-                email = username + "@noemailrequired.com"
+        with transaction.atomic():
+            username = generate_username()
+            user = User(username=username, email=username + "@noemailrequired.com")
+            user.set_unusable_password()  # can only ever use this session
+            user.save()
+            user_type.objects.create(user=user, type="Anonymous")
+            UserProfile.objects.create(user=user, name=username, username=username)
 
-                # Create the anonymous user with the generated credentials
-                user = User.objects.create_user(username=username, email=email, password=password)
-                # Save the user type as Anonymous
-                user_type.objects.create(user=user, type="Anonymous")
-                # Save the user profile
-                UserProfile.objects.create(user=user, name=username, username=username)
+        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+        return JsonResponse({"status": "ok", "redirect": "/generate_keys/"})
 
-                # Authenticate and log in the new anonymous user
-                user = authenticate(username=username, password=password)
-                login(request, user)
-
-                # Return a JSON response with a redirect to the generate keys page
-                return JsonResponse(
-                    {
-                        "status": "ok",
-                        "redirect": request.build_absolute_uri("/generate_keys")
-                    }
-                )
-    else:
-        form = CustomSignupForm()
-
-    # Render the anonymous direct login page if the request method is not POST
-    return render(request, "registration/AnonymousDirectLogin.html", {"form": form})
+    return render(request, "registration/AnonymousDirectLogin.html", {"pow": proof_of_work.issue(ip)})
 
 
+@never_cache
+@require_safe
+def AnonymousChallenge(request):
+    """A fresh proof-of-work challenge (used when the previous one expired)."""
+    return JsonResponse(proof_of_work.issue(client_ip(request)))
+
+
+@require_safe
 def Base(request):
-    """
-    The Base function renders a base iframe template.
-    """
-
-    # Render the base iframe template
+    """Outer page that frames the app."""
     return render(request, "registration/iframe_base.html")

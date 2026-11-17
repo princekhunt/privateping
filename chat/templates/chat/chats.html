@@ -1,88 +1,119 @@
 {% extends "chat/Base.html" %}
 {% load static %}
 
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/chat/screen.css' %}">
+{% endblock %}
+
+{% block page_data %}
+{{ friend.username|json_script:"pp-partner" }}
+{{ friend.name|json_script:"pp-partner-name" }}
+{{ friend_keys|json_script:"pp-friend-keys" }}
+{{ my_keys|json_script:"pp-my-keys" }}
+{% endblock %}
+
+{% block main_class %}pp-chat-main{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/chat/chats.css' %}">
-
-<div>
-    <h3>{{friend.name}}</h3>
-    <span id="live-notification-dot" class="logged-in">● </span><small id="live-notification-text">Connecting...</small>
-</div>
-<p class="text-center"><i class="fa-solid fa-lock"></i> Messages are End-to-End encrypted!</p>
-<p class="trash-messages" onclick="trashmessages();"> 
-    <i class="fa fa-trash-can fa-xl" aria-hidden="true" onclick="trashmessages();"></i> 
-    Trash Messages 
-</p>
-
-<div class="messages" id="board">
-    {% block message %}
-    {% endblock %}
-</div>
-<div class="row">
-    <form method="post" class="form-group" id="chat-box">
-        {% csrf_token %}
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <textarea class="input-textarea" type="text" placeholder=" Enter your message" name="message"
-                    id="msg_field" autocomplete="off" required></textarea> &nbsp; &nbsp;
-                    <label class="select" for="MessageDestroy">
-                        <select id="MessageDestroy" required="required">
-                          <option value="0" selected="selected">Do not destroy</option>
-                          <option value="5">5 seconds</option>
-                          <option value="10">10 seconds</option>
-                          <option value="30">30 seconds</option>
-                          <option value="60">1 minutes</option>
-                          <option value="300">5 minutes</option>
-                          <option value="600">10 minutes</option>
-                          <option value="3600">1 hour</option>
-                        </select>
-                      </label>&nbsp; &nbsp;
-                <button type="submit" name="send" class="btn btn-primary send-button" id="send_btn"> <i
-                        class="fa-solid fa-paper-plane"></i></button>
-
-            </div>
+<header class="pp-chat-head">
+    <span class="pp-avatar pp-avatar-lg" data-seed="{{ friend.username }}" aria-hidden="true">{{ friend.name|slice:":1"|upper }}</span>
+    <div class="pp-chat-who">
+        <h1 class="pp-chat-name">{{ friend.name }} <span class="pp-chat-handle">@{{ friend.username }}</span></h1>
+        <div class="pp-chat-sub">
+            <span id="partner-presence" class="pp-presence" data-state="unknown">
+                <span class="pp-presence-dot" aria-hidden="true"></span><span class="pp-presence-text">Connecting…</span>
+            </span>
+            <span class="pp-sep" aria-hidden="true">·</span>
+            <span class="pp-e2ee" id="e2ee-state">
+                <i class="fa-solid fa-lock" aria-hidden="true" id="live-notification-dot"></i>
+                <span id="live-notification-text">Setting up encryption…</span>
+            </span>
         </div>
-    </form>
+    </div>
+    <div class="pp-chat-tools">
+        <label class="pp-tool pp-autoclear" title="Clear messages automatically when you're inactive">
+            <i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>
+            <span class="pp-autoclear-label">Auto-clear</span>
+            <select id="autoclear-select" aria-label="Clear messages after inactivity">
+                <option value="0">Off</option>
+                <option value="60">1 min</option>
+                <option value="300">5 min</option>
+                <option value="600" selected>10 min</option>
+                <option value="1800">30 min</option>
+            </select>
+        </label>
+        <button type="button" id="verify-button" class="pp-tool" title="Verify encryption with {{ friend.name }}">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span>Verify</span>
+        </button>
+        <button type="button" id="trash-messages" class="pp-tool pp-tool-danger" title="Clear all messages from this screen">
+            <i class="fa-solid fa-broom" aria-hidden="true"></i><span>Clear</span>
+        </button>
+    </div>
+</header>
+
+<div class="pp-chat-banner pp-chat-banner-warn" id="key-banner" hidden>
+    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+    <span>This browser doesn't have your current encryption keys (they may have been cleared, or you logged in
+        somewhere else).</span>
+    <a href="{% url 'registration:generate_keys' %}">Create new keys</a>
 </div>
-<small id="note"></small>
+<div class="pp-chat-banner" id="away-banner" hidden>
+    <i class="fa-solid fa-moon" aria-hidden="true"></i>
+    <span><b>{{ friend.name }}</b> left the chat. New messages will be delivered if they come back soon —
+        otherwise they'll show as <i>Not delivered</i>.</span>
+    <a href="{% url 'chat:dashboard' %}">Back to dashboard</a>
+</div>
 
+<section class="pp-thread-wrap">
+    <div class="pp-thread" id="board" role="log" aria-live="polite" aria-label="Messages with {{ friend.name }}">
+        <div class="pp-thread-empty" id="thread-empty">
+            <div class="pp-thread-empty-icon"><i class="fa-solid fa-lock" aria-hidden="true"></i></div>
+            <h2>Say hi to {{ friend.name }}</h2>
+            <p>Messages are end-to-end encrypted and signed in your browser.<br>
+                This conversation disappears when you leave.</p>
+        </div>
+    </div>
+    <button type="button" class="pp-jump" id="jump-latest" hidden>
+        <i class="fa-solid fa-arrow-down" aria-hidden="true"></i> New messages
+    </button>
+</section>
 
-<script>
-    var messageBody = document.querySelector('.messages');
-    messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
+<div class="pp-idle-warning" id="idle-warning" role="alert" hidden>
+    <i class="fa-solid fa-hourglass-end" aria-hidden="true"></i>
+    <span>You've been inactive. Messages on this screen will be cleared in <b id="idle-countdown">0:30</b>.</span>
+    <button type="button" id="idle-stay">I'm still here</button>
+</div>
 
-    sender_id = "{{ friend.id }}";
-    receiver_id = "{{ curr_user.id }}";
+<form method="post" id="chat-box" class="pp-composer-bar" autocomplete="off">
+    {% csrf_token %}
+    <div class="pp-composer-box">
+        <textarea placeholder="Message {{ friend.name }}" name="message" id="msg_field" rows="1"
+            aria-label="Message {{ friend.name }}"></textarea>
+        <label class="pp-timer" title="Disappearing message timer">
+            <i class="fa-solid fa-stopwatch" aria-hidden="true"></i>
+            <select id="MessageDestroy" aria-label="Disappearing message timer">
+                <option value="0" selected>Off</option>
+                <option value="5">5s</option>
+                <option value="10">10s</option>
+                <option value="30">30s</option>
+                <option value="60">1m</option>
+                <option value="300">5m</option>
+                <option value="600">10m</option>
+                <option value="3600">1h</option>
+            </select>
+        </label>
+        <button type="submit" class="pp-send" id="send_btn" disabled aria-label="Send message" title="Send (Enter)">
+            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+        </button>
+    </div>
+    <div class="pp-composer-hint">
+        <span><kbd>Enter</kbd> to send · <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line</span>
+        <span class="pp-char-count" id="char-count" hidden></span>
+    </div>
+</form>
+{% endblock %}
 
-    function scrolltoend() {
-        $('#board').stop().animate({
-            scrollTop: $('#board')[0].scrollHeight
-        }, 800);
-    }
-
-    const text_box = '<div class="container darker">' +
-        '<img src="{% static 'images/user_image.jpg' %}" alt="Avatar" class="right" style="width:100%;">' +
-        '<p>{description}</p>' +
-        '<span class="time-right">{time}</span>' +
-        '</div>';
-</script>
-
-<script>
-    var input = document.getElementById("msg_field");
-    //allow only 190 words
-    input.addEventListener("input", function () {
-        if (this.value.length > 190)
-            document.getElementById("note").innerHTML = "Only 190 characters are allowed!";
-
-        this.value = this.value.slice(0, 190);
-        //show note that only 190 characters are allowed
-    });
-    //remove note when user stops typing
-    input.addEventListener("blur", function () {
-        document.getElementById("note").innerHTML = "";
-    });
-</script>
-
+{% block scripts %}
 <script src="{% static 'js/chat/chats.js' %}"></script>
-
+<script src="{% static 'js/chat/autoclear.js' %}"></script>
 {% endblock %}

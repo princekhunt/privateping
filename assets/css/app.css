@@ -1,0 +1,227 @@
+:root {
+  --pp-blue: #1289fe;
+  --pp-navy: #003d89;
+  --pp-danger: #d64545;
+  --pp-ok: #2e9e5b;
+  --pp-warn: #d89b18;
+}
+
+.pp-icon-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: rgb(25, 91, 246);
+}
+.pp-icon-button:focus-visible,
+.pp-link-button:focus-visible {
+  outline: 3px solid #9cc8ff;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+.pp-link-button {
+  background: none;
+  border: 0;
+  color: var(--pp-navy);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.sidenav { display: flex; flex-direction: column; }
+.pp-add-friend { margin-left: auto; margin-right: 24px; }
+.friends { overflow-y: auto; flex: 1 1 auto; padding: 0 12px; }
+.pp-friend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px !important;
+  margin-bottom: 8px;
+  border: 0 !important;
+}
+.pp-friend-pending { opacity: 0.65; }
+.sidenav a.pp-friend-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 4px;
+  color: #000;
+}
+.pp-friend-text { display: flex; flex-direction: column; min-width: 0; }
+.pp-friend-name { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-friend-username { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-live { font-size: 0.75rem; color: var(--pp-ok); }
+.pp-live img { width: 24px; height: 24px; }
+.pp-delete-friend { color: rgb(255, 91, 91); padding: 8px; }
+.pp-empty { border-radius: 12px !important; color: #555; font-size: 0.9rem; }
+.pp-logout { padding: 16px 24px 32px; }
+
+.pp-avatar {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.3rem;
+  color: #fff;
+  background: #5a7bd8;
+  user-select: none;
+}
+
+.pp-username-big { font-size: 1.3rem; user-select: all; }
+
+.pp-field-status { min-height: 1.2em; margin-top: -10px; }
+.pp-field-status.ok { color: var(--pp-ok); }
+.pp-field-status.bad { color: var(--pp-danger); }
+.pp-counter { text-align: right; margin-top: -12px; }
+#adduserbutton:disabled { background-color: #9bbbe0; cursor: not-allowed; box-shadow: none; }
+
+.pp-flash-stack {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(420px, calc(100vw - 32px));
+}
+.pp-flash {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: #fff;
+  background: var(--pp-navy);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  font-family: 'Proxima Nova', Georgia, sans-serif;
+}
+.pp-flash span { flex: 1 1 auto; }
+.pp-flash-success { background: var(--pp-ok); }
+.pp-flash-error { background: var(--pp-danger); }
+.pp-flash-warning { background: var(--pp-warn); }
+.pp-flash-hide { opacity: 0; transform: translateY(-8px); }
+.pp-flash-close {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pp-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+}
+.pp-chat-header h3 { margin: 0; }
+.pp-chat-actions { display: flex; gap: 16px; align-items: center; }
+.pp-chat-actions button { background: none; border: 0; cursor: pointer; font-size: 0.95rem; }
+.pp-verify-button { color: var(--pp-navy); }
+.pp-trash-button { color: rgb(200, 57, 57); }
+.pp-e2ee-note { text-align: center; margin: 8px 0 0; color: #555; }
+
+#board .pp-msg {
+  max-width: 70%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+#board .pp-msg h5 { margin: 0; font-size: 1.05rem; }
+#board .pp-msg-meta {
+  display: block;
+  margin: 4px 0 0;
+  font-size: 0.7rem;
+  opacity: 0.75;
+  color: inherit;
+}
+#board .pp-system {
+  clear: both;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #888;
+  padding: 6px 0;
+}
+#board .pp-system.bad { color: var(--pp-danger); }
+
+.pp-composer { display: flex; align-items: flex-end; gap: 12px; padding: 0 16px; }
+.pp-composer textarea { flex: 1 1 auto; width: auto !important; margin-left: 0 !important; resize: none; min-height: 48px; }
+.pp-char-count { min-width: 70px; text-align: right; }
+.pp-char-count.bad { color: var(--pp-danger); }
+
+.pp-safety-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 6px 18px;
+  justify-content: center;
+  margin: 12px 0;
+  user-select: all;
+}
+
+.pp-banner {
+  margin: 12px 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #fff4d6;
+  color: #6b4d00;
+}
+.pp-banner a { font-weight: bold; }
+
+.pp-form-errors {
+  list-style: none;
+  padding: 10px 14px;
+  margin: 0 auto 12px;
+  max-width: 420px;
+  border-radius: 10px;
+  background: rgba(214, 69, 69, 0.92);
+  color: #fff;
+  text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.pp-friend-outgoing { opacity: 0.7; }
+.pp-friend-pending { opacity: 1; }
+.pp-friend-incoming { box-shadow: inset 3px 0 0 var(--pp-blue); }
+.pp-badge {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  background: #e8eef7;
+  color: #46566e;
+}
+.pp-badge-new { background: var(--pp-blue); color: #fff; }
+.pp-greeting { font-size: 1.6rem; font-weight: 600; margin-bottom: 12px; }
+
+#board .pp-msg-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pp-status { font-size: 0.7rem; white-space: nowrap; opacity: 0.9; }
+.pp-status-sending { opacity: 0.7; }
+.pp-status-read { color: #b9f3ff; font-weight: 600; }
+.pp-status-failed { color: #ffe0e0; font-weight: 600; }
+.pp-retry {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: #fff;
+  text-decoration: underline;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+}

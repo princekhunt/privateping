@@ -5,14 +5,13 @@ from django.utils.translation import gettext_lazy as _
 
 import os
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PrivatePing.settings")
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",  # ASGI dev server (websockets) for `manage.py runserver`; must be first
     "unfold",  # before django.contrib.admin
     "unfold.contrib.filters",  # optional, if special filters are needed
     "unfold.contrib.forms",  # optional, if special form elements are needed
@@ -26,11 +25,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'chat.apps.ChatConfig',
     'registration.apps.RegistrationConfig',
-    'rest_framework',
     'channels',
     'django_user_agents',
     'preventconcurrentlogins',
-    'hcaptcha',
 
 ]
 
@@ -39,7 +36,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'registration.middleware.FrameOptionsMiddleware',
+    'registration.middleware.SecurityHeadersMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -81,6 +78,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 10},
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -96,14 +94,39 @@ TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
-USE_L10N = True
 
 USE_TZ = True
 
 
 
+LOGIN_URL = "registration:login"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+# --- Security hardening (shared by all environments) ---
+X_FRAME_OPTIONS = "SAMEORIGIN"          # app frames itself (iframe_base), nobody else may
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_HTTPONLY = True             # JS reads the token from the DOM, not the cookie
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+DATA_UPLOAD_MAX_MEMORY_SIZE = 64 * 1024  # no endpoint needs large bodies
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 50
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+]
+# Behind a single trusted proxy (Heroku router) set this True in production.
+TRUST_X_FORWARDED_FOR = False
+
+# Anonymous (temporary) accounts are deleted after this many seconds.
+ANONYMOUS_ACCOUNT_TTL = 24 * 60 * 60
 
 STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

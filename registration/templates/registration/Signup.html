@@ -2,100 +2,77 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/registration/Signup.css' %}">
-<title>PrivatePing - Signup</title>
+<link rel="stylesheet" href="{% static 'css/registration/auth.css' %}">
+<title>PrivatePing - Create account</title>
 </head>
 
-<body>
-    <span id="pageloader" class="pageloader"></span>
-    <div id="Maincontent">
-        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-            width="100%" height="100%" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
-            <defs>
-                <linearGradient id="bg">
-                    <stop offset="0%" style="stop-color:rgba(130, 158, 249, 0.06)"></stop>
-                    <stop offset="50%" style="stop-color:rgba(76, 190, 255, 0.6)"></stop>
-                    <stop offset="100%" style="stop-color:rgba(115, 209, 72, 0.2)"></stop>
-                </linearGradient>
-                <path id="wave" fill="url(#bg)" d="M-363.852,502.589c0,0,236.988-41.997,505.475,0
-	s371.981,38.998,575.971,0s293.985-39.278,505.474,5.859s493.475,48.368,716.963-4.995v560.106H-363.852V502.589z" />
-            </defs>
-            <g>
-                <use xlink:href='#wave' opacity=".3">
-                    <animateTransform attributeName="transform" attributeType="XML" type="translate" dur="10s"
-                        calcMode="spline" values="270 230; -334 180; 270 230" keyTimes="0; .5; 1"
-                        keySplines="0.42, 0, 0.58, 1.0;0.42, 0, 0.58, 1.0" repeatCount="indefinite" />
-                </use>
-                <use xlink:href='#wave' opacity=".6">
-                    <animateTransform attributeName="transform" attributeType="XML" type="translate" dur="8s"
-                        calcMode="spline" values="-270 230;243 220;-270 230" keyTimes="0; .6; 1"
-                        keySplines="0.42, 0, 0.58, 1.0;0.42, 0, 0.58, 1.0" repeatCount="indefinite" />
-                </use>
-                <use xlink:href='#wave' opacty=".9">
-                    <animateTransform attributeName="transform" attributeType="XML" type="translate" dur="6s"
-                        calcMode="spline" values="0 230;-140 200;0 230" keyTimes="0; .4; 1"
-                        keySplines="0.42, 0, 0.58, 1.0;0.42, 0, 0.58, 1.0" repeatCount="indefinite" />
-                </use>
-            </g>
-        </svg>
+<body class="pp-auth" data-title="PrivatePing - Create account">
+    <a class="pp-auth-back" href="{% url 'registration:home' %}"><i class="fa-solid fa-arrow-left"></i> Back</a>
 
-        <div class="login-container" id="login-container">
-            <h1 class="signup-title">Let's embark a journey towards privacy!</h1>
-            <div id="login-form">
-                <span class="userloader"></span>
-                <h1 class="antiquewhite" id="processing"></h1>
-                <form id="LoginForm" method="post">{% csrf_token %}
+    <main class="pp-auth-card">
+        <div class="pp-auth-brand">
+            <span class="pp-auth-logo"><i class="fa-solid fa-lock" aria-hidden="true"></i></span>
+            <span>PrivatePing</span>
+        </div>
 
-                    <div id="name-field">
-                        <p class="name-field antiquewhite">What should we call you?</p>
-                        <div class="input-container">
-                            <input type="text" class="input-field input-field-1" id="name" name="name"
-                                placeholder="Name" autocomplete="off">
-                            <button class="login-button" id="name-button">&rarr;</button>
-                        </div>
-                    </div>
+        <h1>Create your account</h1>
+        <p class="pp-auth-sub">No email or phone number needed.</p>
 
-                    <div id="username-field">
-                        <p class="antiquewhite">Enter Username</p>
-                        <div class="input-container">
-                            <input type="text" class="input-field input-field-1" id="username" name="username"
-                                placeholder="Username" autocomplete="off">
-                            <button class="login-button" id="username-button">&rarr;</button>
-                        </div>
-                        <p class="error-message" id="username-error-field"></p>
-                    </div>
+        {% if errors %}
+        <ul class="pp-auth-alert pp-form-errors" role="alert">
+            {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+        {% endif %}
 
-                    <div id="password-field-1">
-                        <p class="antiquewhite">Enter Password</p>
-                        <div class="input-container">
-                            <input type="password" class="input-field input-field-2" id="password-1" name="password1"
-                                placeholder="Password" autocomplete="off">
-                            <button class="login-button" id="password-1-button"><span>&rarr;</span></button>
-                        </div>
-                        <p class="antiquewhite" id="password-text"></p>
-
-                    </div>
-
-                    <div id="password-field-2">
-                        <p class="antiquewhite">Confirm Password</p>
-                        <div class="input-container">
-                            <input type="password" class="input-field input-field-2" id="password-2" name="password2"
-                                placeholder="Confirm Password" autocomplete="off">
-                            <button type="submit" class="login-button" id="login-button"><span>&#10003;</span></button>
-                        </div>
-                        {% if error %}
-                        <div class="error-message" id="error-field">
-                            Invalid username or password!</div>
-                        {% endif %}
-                    </div>
-                </form>
-                <p class="fact-title">Do you know?</p>
-                <small class="fact">{{fact}}</small>
-                <div>
-                    <button class="btn-lg btn-primary back-btn" onclick="goback();"><i class="fa fa-arrow-left"
-                            aria-hidden="true"></i></button>
-                </div>
+        <form method="post" id="auth-form" data-mode="signup" novalidate>
+            {% csrf_token %}
+            <div class="pp-field" id="field-name">
+                <label for="name">Display name</label>
+                <input type="text" id="name" name="name" value="{{ name|default:'' }}" maxlength="25"
+                    autocomplete="name" required autofocus>
+                <small class="pp-hint" aria-live="polite">Shown to your friends.</small>
             </div>
 
-            <script src="{% static 'js/registration/Signup.js' %}"></script>
-            {% endblock %}
+            <div class="pp-field" id="field-username">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" value="{{ username|default:'' }}" minlength="5"
+                    maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+                <small class="pp-hint" aria-live="polite">5–20 characters: letters, numbers and _</small>
+            </div>
+
+            <div class="pp-field" id="field-password1">
+                <label for="password1">Password</label>
+                <div class="pp-password">
+                    <input type="password" id="password1" name="password1" minlength="10"
+                        autocomplete="new-password" required>
+                    <button type="button" class="pp-reveal" data-target="password1" aria-label="Show password">
+                        <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <small class="pp-hint" aria-live="polite">At least 10 characters. Avoid common passwords.</small>
+            </div>
+
+            <div class="pp-field" id="field-password2">
+                <label for="password2">Confirm password</label>
+                <div class="pp-password">
+                    <input type="password" id="password2" name="password2" autocomplete="new-password" required>
+                    <button type="button" class="pp-reveal" data-target="password2" aria-label="Show password">
+                        <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <small class="pp-hint" aria-live="polite"></small>
+            </div>
+
+            <button type="submit" class="pp-auth-submit" id="submit-button">Create account</button>
+        </form>
+
+        <p class="pp-auth-switch">Already have an account? <a href="{% url 'registration:login' %}">Log in</a></p>
+    </main>
+
+    <div class="pp-auth-trust">
+        <span><i class="fa-solid fa-lock" aria-hidden="true"></i> End-to-end encrypted</span>
+        <span><i class="fa-solid fa-ghost" aria-hidden="true"></i> Messages never stored</span>
+    </div>
+
+    <script src="{% static 'js/registration/auth.js' %}"></script>
+{% endblock %}

@@ -12,5 +12,7 @@ urlpatterns = [
     path("request", views.FriendRequest, name="FriendRequest"),
     path('waiting-room', views.waiting_room, name="waiting-room"),
     path('api/room', views.room, name='room'),
+    path('api/friends', views.friends_partial, name='friends'),
+    path('api/decline_chat', views.decline_chat, name='decline-chat'),
 
 ]

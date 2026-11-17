@@ -1,0 +1,19 @@
+{% extends "registration/Base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/registration/GenerateKeys.css' %}">
+<title>PrivatePing - Logged out</title>
+</head>
+
+<body data-title="PrivatePing - Logged out">
+  <div id="login-container">
+    <div id="login-form">
+      <span class="loader"></span>
+      <h1 id="processing">Erasing your keys from this browser…</h1>
+      <noscript><a href="/">Continue</a></noscript>
+    </div>
+  </div>
+  <script src="{% static 'js/crypto.js' %}"></script>
+  <script src="{% static 'js/registration/LoggedOut.js' %}"></script>
+{% endblock %}

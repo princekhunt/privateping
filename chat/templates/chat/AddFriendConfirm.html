@@ -1,0 +1,25 @@
+{% extends "chat/Base.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/chat/FriendRequest.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <h1 id="request-text">Send a friend request to <u>{{ target.username }}</u>?</h1>
+    <p class="pp-e2ee-note">They'll be able to chat with you once they accept.</p>
+    <form method="post" action="{% url 'chat:addFriend' target.username %}">
+        {% csrf_token %}
+        <br>
+        <label for="confirm-note"><small>Note (optional)</small></label>
+        <textarea class="add-user-input" id="confirm-note" name="note" maxlength="100" placeholder="Hi, it's me!">{{ note }}</textarea>
+        <br><br>
+        <button type="submit" class="btn btn-outline-success request-button" aria-label="Send request"><i class="fa-solid fa-check"></i></button>
+        Send request
+        &nbsp;&nbsp;&nbsp;
+        <a href="{% url 'chat:dashboard' %}" class="btn btn-outline-danger request-button" aria-label="Cancel"><i class="fa-solid fa-xmark"></i></a>
+        Cancel
+    </form>
+</div>
+{% endblock %}

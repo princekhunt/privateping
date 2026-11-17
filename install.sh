@@ -12,25 +12,40 @@ if ! [ -x "$(command -v pip3)" ]; then
   exit 1
 fi
 
-#install virtualenv
-pip3 install virtualenv
+#pick a supported python (Django 6.1 needs Python 3.12+; 3.15 is what the pins are tested on)
+PY=""
+for candidate in python3.15 python3.14 python3.13 python3.12; do
+  if command -v "$candidate" >/dev/null 2>&1; then PY="$candidate"; break; fi
+done
+if [ -z "$PY" ]; then
+  echo 'Error: Python 3.12 or newer is required.' >&2
+  exit 1
+fi
 
 #create virtual environment
-python3 -m venv venv
+"$PY" -m venv venv
 
 #activate virtual environment
 source venv/bin/activate
 
 #install requirements
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 
-#create .env file in PrivatePing/settings
-echo "SECRET_KEY='*$j@tpltfyblml&*1d+n9t@il^0xef4=bvdu&!7r=zvoq$a19g'" > PrivatePing/settings/.env
-echo "SECRET_ADMIN_URL=''" >> PrivatePing/settings/.env
-echo "HCAPTCHA_SITEKEY='10000000-ffff-ffff-ffff-000000000001'" >> PrivatePing/settings/.env
-echo "HCAPTCHA_SECRET='0x0000000000000000000000000000000000000000'" >> PrivatePing/settings/.env
+#create .env file in PrivatePing/settings with a freshly generated secret key
+ENV_FILE=PrivatePing/settings/.env
+if [ ! -f "$ENV_FILE" ]; then
+  SECRET=$(python -c 'import secrets; print(secrets.token_urlsafe(50))')
+  ADMIN=$(python -c 'import secrets; print(secrets.token_urlsafe(12))')
+  {
+    echo "SECRET_KEY='$SECRET'"
+    echo "SECRET_ADMIN_URL='$ADMIN/'"
+  } > "$ENV_FILE"
+  chmod 600 "$ENV_FILE"
+  echo "Admin panel: http://localhost:8000/$ADMIN/admin/"
+fi
+
 #run migrations
-python3 manage.py migrate
+python manage.py migrate
 
 #run server
-python3 manage.py runserver
+python manage.py runserver

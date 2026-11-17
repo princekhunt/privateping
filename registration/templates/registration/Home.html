@@ -8,17 +8,17 @@
 <title>PrivatePing: A secure messaging Application</title>
 </head>
 
-<body>
+<body data-title="PrivatePing: A secure messaging Application">
   <span id="pageloader" class="pageloader"></span>
 
   <div id="Maincontent" class="container">
     <img class="logo" src="{% static '/images/logo/png/logo-no-background.png' %}" alt="Logo" />
     <div class="buttons">
-      <button onclick="login();">Login</button>
-      <button onclick="register();">Signup</button>
+      <button type="button" data-href="{% url 'registration:login' %}">Login</button>
+      <button type="button" data-href="{% url 'registration:register' %}">Signup</button>
     </div>
     <div class="buttons">
-      <button onclick="anonymousLogin();">Anonymous Direct Login</button>
+      <button type="button" data-href="{% url 'registration:anonymous_direct_login' %}">Anonymous Direct Login</button>
     </div>
     <b>
       <p class="fact-title">Do you know?</p>
@@ -27,27 +27,14 @@
     <div class="buttons">
       <h5 class="credits" id="credits">An open source project, Initiated by
 
-        <a target="_blank" href="https://linkedin.com/in/princekhunt">Prince Khunt</a> &
-        <a target="_blank" href="https://www.linkedin.com/in/viraj-bhingradiya-720b39216">Viraj Bhingradiya</a>. Give a
-        ⭐️ on <a target="_blank" href="https://github.com/princekhunt/privateping">Github</a>.
+        <a target="_blank" rel="noopener noreferrer" href="https://linkedin.com/in/princekhunt">Prince Khunt</a> &
+        <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/viraj-bhingradiya-720b39216">Viraj Bhingradiya</a>. Give a
+        ⭐️ on <a target="_blank" rel="noopener noreferrer" href="https://github.com/princekhunt/privateping">Github</a>.
         <br>Checkout
-        <a target="_blank" href="https://privateping.apps.princekhunt.com/humans.txt">Contributors!</a>
+        <a target="_blank" rel="noopener" href="/humans.txt">Contributors!</a>
       </h5>
     </div>
   </div>
 
   <script type="text/javascript" src="{% static 'js/registration/registration_home.js' %}"></script>
-  <script>
-    function login() {
-      window.location.href = "{% url 'registration:login' %}";
-    }
-    function register() {
-      window.location.href = "{% url 'registration:register' %}";
-    }
-
-    function anonymousLogin() {
-      window.location.href =
-        "{% url 'registration:anonymous_direct_login' %}";
-    }
-  </script>
   {% endblock %}

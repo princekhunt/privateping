@@ -12,6 +12,7 @@ urlpatterns = [
     path("signup/", views.Signup, name="register"),
     path("login/", views.Login, name="login"),
     path("AnonymousDirectLogin", views.AnonymousDirectLogin, name="anonymous_direct_login"),
+    path("api/anonymous_challenge/", views.AnonymousChallenge, name="anonymous_challenge"),
     path("logout/", views.Logout, name="logout"),
     path("generate_keys/", views.GenerateKeys, name="generate_keys"),
     path("api/check_username/", views.UsernameCheck, name="username_check"),

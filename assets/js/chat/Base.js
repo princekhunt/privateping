@@ -1,331 +1,319 @@
-function escapeHtml(text) {
-    return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function getUserName() {
+  const partner = PP.readJSON("pp-partner", null);
+  return typeof partner === "string" && partner ? partner : "NULL";
 }
 
-function getUserName(){
-    //check if current page is waiting room without function
-    if (window.location.href.indexOf("waiting-room") > -1) {
-        name = 'user';
-        name = escapeHtml(name);
-        name = name.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
-        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-        var results = regex.exec(location.search);
-        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        
-    }
-    else if (window.location.href.indexOf("chat") > -1) {
-            // Remove trailing slashes if any
-            url = window.location.href;
-            url = url.replace(/\/+$/, '');
-            // Split the URL by slashes
-            var parts = url.split('/');
-            // Get the last part of the array
-            var lastPart = parts[parts.length - 1];
-            // Return the last directory
-            return lastPart;
-    }
-    else{
-        return "NULL";
-    }
+function destroyer(delay, element) {
+  setTimeout(function () {
+    if (!element || !element.parentNode) return;
+    element.classList.add("pp-vanish");
+    setTimeout(function () { element.remove(); }, 350);
+  }, delay * 1000);
 }
 
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i].trim();
-        // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-            cookieValue = decodeURIComponent(
-            cookie.substring(name.length + 1)
-            );
-            break;
-        }
-        }
-    }
-    return cookieValue;
+function markActiveFriend() {
+  const partner = getUserName();
+  document.querySelectorAll(".pp-friend").forEach(function (li) {
+    li.classList.toggle("is-active", li.dataset.username === partner);
+  });
 }
 
-async function encryptData(data, publicKey) {
-    //convert the public key to an object
-    publicKey = JSON.parse(publicKey);
-    //convert the public key to a CryptoKey object
-    publicKey = await window.crypto.subtle.importKey(
-        "jwk",
-        publicKey,
-        {
-            name: "RSA-OAEP",
-            hash: {name: "SHA-256"},
-        },
-        true,
-        ["encrypt"]
-    );
-  const encryptedData = await window.crypto.subtle.encrypt(
-    {
-      name: "RSA-OAEP",
-    },
-    publicKey, // from generateKey or importKey above
-    data // ArrayBuffer of data you want to encrypt
-  );
-    return encryptedData;
-}
+(function () {
+  "use strict";
 
-async function decryptData(encryptedData, privateKey) {
-    // convert the private key to a CryptoKey object
-    privateKey = await window.crypto.subtle.importKey(
-        "jwk",
-        privateKey,
-        {
-            name: "RSA-OAEP",
-            hash: {name: "SHA-256"},
-        },
-        true,
-        ["decrypt"]
-    );
+  const me = PP.readJSON("pp-me", "");
+  markActiveFriend();
+  const USERNAME_RE = /^[A-Za-z0-9_]{1,20}$/;
 
-  const decryptedData = await window.crypto.subtle.decrypt(
-    {
-      name: "RSA-OAEP",
-    },
-    privateKey, // from generateKey or importKey above
-    encryptedData // ArrayBuffer of the data
-  );
-  return decryptedData;
-}
+  const input = document.getElementById("finduser");
+  const button = document.getElementById("adduserbutton");
+  const status = document.getElementById("finduser-status");
+  const form = document.getElementById("adduserform");
+  const note = document.getElementById("note");
+  const noteCount = document.getElementById("note-count");
 
-//driver code
+  function setStatus(text, ok) {
+    status.textContent = text;
+    status.className = "pp-field-status " + (ok ? "ok" : "bad");
+    button.disabled = !ok;
+  }
 
-async function main(){
-    //get the private key from local storage
-    
-    //do encrypt
-    const privateKey = await window.crypto.subtle.importKey(
-        "jwk",
-        JSON.parse(localStorage.getItem("privateKey")),
-        {
-            name: "RSA-OAEP",
-            hash: {name: "SHA-256"},
-        },
-        true,
-        ["decrypt"]
-    );
+  if (input && button && form) {
+    let timer = null;
+    let seq = 0;
+    input.addEventListener("input", function () {
+      const username = input.value.trim();
+      clearTimeout(timer);
+      if (!username) { setStatus("", false); return; }
+      if (username === me) { setStatus("That's you!", false); return; }
+      if (!USERNAME_RE.test(username)) { setStatus("Usernames only contain letters, digits and _", false); return; }
+      timer = setTimeout(function () {
+        const mine = ++seq;
+        $.getJSON("/api/check_username/", { username: username }).done(function (r) {
+          if (mine !== seq) return;
+          if (r.status !== "ok") { setStatus("Couldn't check right now, try again.", false); return; }
+          if (r.exists && !r.self) setStatus("✓ User found", true);
+          else if (r.self) setStatus("That's you!", false);
+          else setStatus("No user with this username", false);
+        }).fail(function () { setStatus("Couldn't check right now, try again.", false); });
+      }, 250);
+    });
 
-}
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (button.disabled) return;
+      form.action = "/addfriend/" + encodeURIComponent(input.value.trim());
+      button.disabled = true;
+      form.submit();
+    });
+    $("#AddFriend").on("shown.bs.modal", function () { input.focus(); });
+  }
 
-$(document).ready(function() {
-    $('#adduserbutton').prop('disabled', true)
-    $('#finduser').on('keyup', function(){
-        var username = $('#finduser').val();
-        $.ajax({
-            url: '../api/check_username/',
-            dataType: 'json',
-            data: { 
-                'username': username 
-            },
-            success: function(response){
-                if(response.status == "ok"){
-                    if(!response.available){
-                        if(!response.self){
-                        $('#finduser').css('border', '2px solid green');
-                        $('#adduserbutton').prop('disabled', false);
-                        }
-                        else{
-                            $('#finduser').css('border', '2px solid red');
-                            $('#adduserbutton').prop('disabled', true);
-                        }
-                    }
-                    else{
-                        $('#finduser').css('border', '2px solid red');
-                        $('#adduserbutton').prop('disabled', true);
+  if (note && noteCount) {
+    note.addEventListener("input", function () {
+      if (note.value.length > 100) note.value = note.value.substring(0, 100);
+      noteCount.textContent = note.value.length;
+    });
+  }
 
-                    }
-                }
-            }
-        });
-    })
-});
-
-//limit note length
-$(document).ready(function() {
-    $('#note').on('keyup', function(){
-        var note = $('#note').val();
-        if(note.length > 100){
-            $('#note').val(note.substring(0, 100));
-        }
-    })
-});
-
-function destroyer(delay, element){
-setTimeout(() => {
-    //element is class name
-    var Message = document.getElementsByClassName(element);
-    Message = Message[0];
-    Message.remove();
-    
-}, delay * 1000);
-}
-
-function delete_friend(friend){
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You want to remove this user from your friend list. This action cannot be undone!",
-        icon: 'warning',
+  document.addEventListener("click", function (e) {
+      const el = e.target.closest(".pp-delete-friend");
+      if (!el) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const friend = el.dataset.username;
+      const row = el.closest(".pp-friend");
+      const pending = row && !row.classList.contains("pp-friend-friends");
+      Swal.fire({
+        title: pending ? "Cancel request with " + friend + "?" : "Remove " + friend + "?",
+        text: pending ? "The friend request will be withdrawn."
+          : "They will be removed from your friend list. You can send a new request later.",
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Remove",
+      }).then(function (result) {
+        if (!result.isConfirmed) return;
+        $.ajax({
+          url: "/delete_friend",
+          type: "POST",
+          dataType: "json",
+          headers: { "X-CSRFToken": PP.csrfToken() },
+          data: { friend: friend },
+        }).done(function (response) {
+          if (response.status === true) {
+            const onThisFriend = getUserName() === friend;
+            window.location.href = onThisFriend ? "/dashboard" : window.location.href;
+          } else {
+            Swal.fire("Error", response.message || "Something went wrong. Please try again.", "error");
+          }
+        }).fail(function () {
+          Swal.fire("Error", "Something went wrong. Please try again.", "error");
+        });
+      });
+  });
+
+  const friendsBox = document.getElementById("friends");
+  let refreshing = null;
+
+  function refreshFriends() {
+    if (!friendsBox || refreshing) return refreshing;
+    refreshing = fetch(friendsBox.dataset.url, { credentials: "same-origin", headers: { "Accept": "text/html" } })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
+      .then(function (html) {
+
+        friendsBox.innerHTML = html;
+        PP.paintAvatars(friendsBox);
+        markActiveFriend();
+        applySearch();
+
+        const wasShowing = Array.from(showing);
+        showing.clear();
+        wasShowing.forEach(function (u) { setWaiting(u, true); });
+      })
+      .catch(function () {  })
+      .then(function () { refreshing = null; });
+    return refreshing;
+  }
+
+  const FRIEND_EVENTS = {
+    request: { icon: "info", text: " sent you a friend request", action: "Review" },
+    accepted: { icon: "success", text: " accepted your friend request", action: "Chat now" },
+    rejected: { icon: "info", text: " declined your friend request", retry: "You can send a new request in " },
+    removed: { icon: "info", text: " removed you from their friends" },
+  };
+
+  function onFriendsChanged(data) {
+    refreshFriends();
+    const info = FRIEND_EVENTS[data.event];
+    const from = typeof data.from === "string" && USERNAME_RE.test(data.from) ? data.from : null;
+    if (!info || !from) return;
+    if (data.event === "removed" && getUserName() === from) {
+      Swal.fire({ icon: "info", title: from + " removed you", text: "This chat is closed.",
+        confirmButtonColor: "#003d89" }).then(function () { window.location.href = "/dashboard"; });
+      return;
+    }
+    new Audio("/static/media/notification.mp3").play().catch(function () {});
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: info.icon,
+      title: from + info.text,
+      text: info.retry && data.retry_text ? info.retry + data.retry_text + "." : undefined,
+      showConfirmButton: !!info.action,
+      confirmButtonText: info.action || "OK",
+      confirmButtonColor: "#003d89",
+      showCloseButton: true,
+      timer: 10000,
+      timerProgressBar: true,
+    }).then(function (r) {
+      if (!r.isConfirmed) return;
+      window.location.href = data.event === "request"
+        ? "/request?user=" + encodeURIComponent(from)
+        : "/waiting-room?user=" + encodeURIComponent(from);
+    });
+  }
+
+  function onChatDeclined(data) {
+    const from = typeof data.from === "string" && USERNAME_RE.test(data.from) ? data.from : null;
+    if (!from) return;
+    const retry = data.retry_text ? "You can try again in " + data.retry_text + "." : "Please try again later.";
+    new Audio("/static/media/notification.mp3").play().catch(function () {});
+    if (getUserName() === from && document.getElementById("waiting_text")) {
+      window.__ppDeclined = true;
+      Swal.fire({
+        icon: "info",
+        title: from + " declined your chat request",
+        text: retry + " The wait gets longer if requests keep getting declined.",
+        confirmButtonText: "Back to dashboard",
+        confirmButtonColor: "#003d89",
+        allowOutsideClick: false,
+      }).then(function () { window.location.href = "/dashboard"; });
+    } else {
+      Swal.fire({ toast: true, position: "top-end", icon: "info", timer: 8000, timerProgressBar: true,
+        showConfirmButton: false, showCloseButton: true, title: from + " declined your chat request", text: retry });
+    }
+  }
+
+  const search = document.getElementById("friend-search");
+  function applySearch() {
+    if (!friendsBox) return;
+    const q = search ? search.value.trim().toLowerCase() : "";
+    let any = false;
+    friendsBox.querySelectorAll(".pp-friend").forEach(function (li) {
+      const match = !q || (li.dataset.search || "").indexOf(q) !== -1;
+      li.hidden = !match;
+      if (match) any = true;
+    });
+    friendsBox.querySelectorAll(".pp-group").forEach(function (g) {
+      g.hidden = !g.querySelector(".pp-friend:not([hidden])");
+    });
+    const none = document.getElementById("friend-nomatch");
+    if (none) none.hidden = !q || any;
+  }
+  if (search) {
+    search.addEventListener("input", applySearch);
+    search.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { search.value = ""; applySearch(); }
+      if (e.key === "Enter") {
+        const first = friendsBox.querySelector(".pp-friend:not([hidden]) .pp-friend-link");
+        if (first) first.click();
+      }
+    });
+  }
+  setInterval(function () { if (document.visibilityState === "visible") refreshFriends(); }, 30000);
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") refreshFriends();
+  });
+
+  const socket = new WebSocket(PP.wsUrl("/ws/notify/"));
+  const ignored = new Set();
+  const notified = new Set();
+  const showing = new Set();
+
+  function liveSlot(user) {
+    return document.getElementById("live_notification_" + user);
+  }
+
+  function setWaiting(user, on) {
+    const slot = liveSlot(user);
+    if (!slot) return;
+    const row = slot.closest(".pp-friend");
+    if (on && !showing.has(user)) {
+      slot.textContent = "Waiting";
+      slot.title = user + " is waiting for you in the chat room";
+      if (row) row.classList.add("is-waiting");
+      showing.add(user);
+    } else if (!on && showing.has(user)) {
+      slot.textContent = "";
+      if (row) row.classList.remove("is-waiting");
+      showing.delete(user);
+    }
+  }
+
+  socket.addEventListener("open", function () {
+    socket.send(JSON.stringify({ available: "ping" }));
+  });
+
+  socket.addEventListener("message", function (e) {
+    let data;
+    try { data = JSON.parse(e.data); } catch (err) { return; }
+    if (data.status === "friends") { onFriendsChanged(data); return; }
+    if (data.status === "declined") { onChatDeclined(data); return; }
+    let users = [];
+    if (data.status === "notify") {
+      try { users = JSON.parse(data.from); } catch (err) { users = []; }
+      if (!Array.isArray(users)) users = [];
+      users = users.filter(function (u) { return typeof u === "string" && USERNAME_RE.test(u) && u !== getUserName(); });
+    }
+
+    Array.from(showing).forEach(function (u) { if (users.indexOf(u) === -1) setWaiting(u, false); });
+
+    users.forEach(function (user) {
+      setWaiting(user, true);
+      if (ignored.has(user) || notified.has(user)) return;
+      notified.add(user);
+      new Audio("/static/media/notification.mp3").play().catch(function () {});
+      Swal.fire({
+        title: user + " is waiting for you",
+        text: "Join the secure chat room now?",
+        icon: "info",
+        position: "top-end",
+        toast: true,
+        showDenyButton: true,
+        confirmButtonText: "Join now",
+        denyButtonText: "Decline",
+        confirmButtonColor: "#003d89",
+        timer: 8000,
+        timerProgressBar: true,
+      }).then(function (result) {
         if (result.isConfirmed) {
-            $.ajax({
-                url: '../delete_friend',
-                dataType: 'json',
-                data: { 
-                    'friend': friend 
-                },
-                success: function(response){
-                    if(response.status == true){
-                        Swal.fire({
-                            title: 'Deleted!',
-                            text: 'User has been deleted.',
-                            confirmButtonColor: '#3085d6',
-                            icon: 'success',
-                          }).then(function(){
-                            parent.location.href = '/';
-                          });
-                    }
-                    else{
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'An error occured. Please try again later.',
-                            confirmButtonColor: '#3085d6',
-                            icon: 'error',
-                    });
-                    }
-                },
-                error: function(response){
-                    Swal.fire(
-                        'Error!',
-                        'An error occured. Please try again later.',
-                        'error'
-                      );
-                }
-            });
-        
+          window.location.href = "/waiting-room?user=" + encodeURIComponent(user);
+        } else if (result.isDenied) {
+          ignored.add(user);
+          setWaiting(user, false);
+          $.ajax({
+            url: "/api/decline_chat",
+            type: "POST",
+            dataType: "json",
+            headers: { "X-CSRFToken": PP.csrfToken() },
+            data: { user: user },
+          }).done(function (r) {
+            if (r.status) {
+              Swal.fire({ toast: true, position: "top-end", icon: "success", timer: 3500,
+                showConfirmButton: false, title: "Declined", text: user + " has been told you're not available." });
+            }
+          });
         }
       });
-    }
+    });
 
-// This socket is to notify a user, if another user is waiting.
-const socketProtocol_4 = (window.location.protocol === "https:") ? "wss" : "ws";
-const socket_4 = new WebSocket(socketProtocol_4 + "://" + window.location.host + '/ws/notify/');
+    Array.from(notified).forEach(function (u) { if (users.indexOf(u) === -1) notified.delete(u); });
+  });
 
-socket_4.onopen = function (e) {
-    socket_4.send(JSON.stringify({
-        'available': 'ping'
-    }));
-};
-
-IgnoreList = new Array(); // List of users to ignore
-Notified = new Array(); // List of users who are already notified
-LoaderNotifying = new Array(); // List of users who are already showing loader
-
-socket_4.addEventListener('message', function (e) {
-    const data = JSON.parse(e.data);
-    if (data.status == 'notify') { //if status is notify, it means, someone is waiting
-        users = JSON.parse(data.from);
-        
-        //if current page is chat page, then remove the current user from the list
-        if(window.location.href.indexOf("chat") > -1){
-            users = users.filter(function(value, index, arr){
-                return value != getUserName();
-            });
-        }
-
-        // if there is a loader, but user is no longer online, then remove the loader
-        for (var i = 0; i < LoaderNotifying.length; i++) {
-            user = LoaderNotifying[i];
-            if(!users.includes(user)){
-                $('#live_notification_'+user).empty();
-                LoaderNotifying.splice(i, 1);
-            }
-        }
-
-        // Show loader and toast notification
-        for(var i=0; i < users.length; i++){    
-            CurrentUser = users[i]
-            if(IgnoreList.includes(CurrentUser)){ // If user is in ignore list, then do not show toast notification
-                 if(!LoaderNotifying.includes(CurrentUser)){
-                    // show loader
-                     $('#live_notification_'+CurrentUser).append("<img src='/static/images/wait.gif' style='width: 30px; height: 30px' /><small style='font-size:50%;' >Waiting!</small>");
-                     LoaderNotifying.push(CurrentUser);
-                 }
-                continue;
-            }
-
-            // if user is not yet notified, then show loader
-            if(!Notified.includes(CurrentUser)){
-                $('#live_notification_'+CurrentUser).append("<img src='/static/images/wait.gif' style='width: 30px; height: 30px' /><small style='font-size:50%;' ><b>Waiting!</b></small>");
-                LoaderNotifying.push(CurrentUser);
-            }
-
-            // Notify a user (toast notification)
-            Notified.push(CurrentUser);
-            //play sound
-            var audio = new Audio('/static/media/notification.mp3');
-            audio.play();
-            Swal.fire({
-                title: "A Secure Chat Room",
-                text: CurrentUser + " is waiting for you in the waiting room!",
-                icon: "warning",
-                position: "top-end",
-                confirmButtonText: 'Join Now',
-                denyButtonText: 'Ignore!',
-                toast: true,
-                showDenyButton: true,
-                confirmButtonColor: "#003d89",
-                timer: 3000,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "/waiting-room?user=" + CurrentUser;
-                    //remove the user from the list
-                    users.splice(users.indexOf(CurrentUser), 1);
-
-                }
-                else if (result.isDenied) {
-                    IgnoreList.push(CurrentUser); //add user to ignore list
-                    //show toast message that user is ignored
-                    Swal.fire({
-                        title: "User Ignored",
-                        text: "You will not be notified again for this user for a while!",
-                        icon: "info",
-                        position: "top-end",
-                        toast: true,
-                        showConfirmButton: false,
-                        timer: 4000,
-                    });
-                    
-                }
-            }
-            );
-            
-        };
-    }
-    else{
-        //No users are waiting
-       //if any loader active and no user is waiting, then remove the loader
-         for (var i = 0; i < LoaderNotifying.length; i++) {
-                user = LoaderNotifying[i];
-                $('#live_notification_'+user).empty();
-                LoaderNotifying.splice(i, 1);
-          }
-    }
-});
-
-setInterval(function () {
-    socket_4.send(JSON.stringify({
-        'available': 'ping',
-    }));
-}, 3000);
-
-parent.document.title = "PrivatePing - A Secure Chat Room";
+  setInterval(function () {
+    if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ available: "ping" }));
+  }, 3000);
+})();

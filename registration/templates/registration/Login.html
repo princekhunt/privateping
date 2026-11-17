@@ -2,78 +2,62 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/registration/Login.css' %}">
-<title>PrivatePing - Login</title>
+<link rel="stylesheet" href="{% static 'css/registration/auth.css' %}">
+<title>PrivatePing - Log in</title>
 </head>
 
-<body>
-    <span id="pageloader" class="pageloader"></span>
-    <div id="Maincontent">
-        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-            width="100%" height="100%" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
-            <defs>
-                <linearGradient id="bg">
-                    <stop offset="0%" style="stop-color:rgba(130, 158, 249, 0.06)"></stop>
-                    <stop offset="50%" style="stop-color:rgba(76, 190, 255, 0.6)"></stop>
-                    <stop offset="100%" style="stop-color:rgba(115, 209, 72, 0.2)"></stop>
-                </linearGradient>
-                <path id="wave" fill="url(#bg)" d="M-363.852,502.589c0,0,236.988-41.997,505.475,0
-	s371.981,38.998,575.971,0s293.985-39.278,505.474,5.859s493.475,48.368,716.963-4.995v560.106H-363.852V502.589z" />
-            </defs>
-            <g>
-                <use xlink:href='#wave' opacity=".3">
-                    <animateTransform attributeName="transform" attributeType="XML" type="translate" dur="10s"
-                        calcMode="spline" values="270 230; -334 180; 270 230" keyTimes="0; .5; 1"
-                        keySplines="0.42, 0, 0.58, 1.0;0.42, 0, 0.58, 1.0" repeatCount="indefinite" />
-                </use>
-                <use xlink:href='#wave' opacity=".6">
-                    <animateTransform attributeName="transform" attributeType="XML" type="translate" dur="8s"
-                        calcMode="spline" values="-270 230;243 220;-270 230" keyTimes="0; .6; 1"
-                        keySplines="0.42, 0, 0.58, 1.0;0.42, 0, 0.58, 1.0" repeatCount="indefinite" />
-                </use>
-                <use xlink:href='#wave' opacty=".9">
-                    <animateTransform attributeName="transform" attributeType="XML" type="translate" dur="6s"
-                        calcMode="spline" values="0 230;-140 200;0 230" keyTimes="0; .4; 1"
-                        keySplines="0.42, 0, 0.58, 1.0;0.42, 0, 0.58, 1.0" repeatCount="indefinite" />
-                </use>
-            </g>
-        </svg>
+<body class="pp-auth" data-title="PrivatePing - Log in">
+    <a class="pp-auth-back" href="{% url 'registration:home' %}"><i class="fa-solid fa-arrow-left"></i> Back</a>
 
-
-        <div class="login-container" id="login-container">
-            <h1 class="antiquewhite">PrivatePing - Login</h1>
-            <div id="login-form">
-                <img src="{% static 'images/user/login.gif' %}" alt="Loading" id="loading-gif" height="40%" width="40%">
-                <h1 class="antiquewhite" id="processing"></h1>
-                <form id="LoginForm" method="post">{% csrf_token %}
-                    <div id="username-form">
-                        <div class="input-container">
-                            <input type="text" class="input-field input-field-1" id="username" name="username"
-                                placeholder="Username">
-                            <button class="login-button" id="username-button">&rarr;</button>
-                        </div>
-                    </div>
-                    <div id="password-field">
-                        <div class="input-container">
-                            <input type="password" class="input-field input-field-2" id="password" name="password"
-                                placeholder="Password">
-                            <button type="submit" class="login-button" id="login-button"><span>&#10003;</span></button>
-                        </div>
-                    </div>
-                    {% if error %}
-                    <div class="error-message" id="error-field">Invalid
-                        username or password!</div>
-                    {% endif %}
-            </div>
-            </form>
-            <p class="error-message" id="err_mssg"></p>
-            <p class="fact-title">Do you know?</p>
-            <small class="  ">{{fact}}</small>
-            <div>
-                <button class="btn-lg btn-primary back-btn" onclick="goback();"><i class="fa fa-arrow-left"
-                        aria-hidden="true"></i></button>
-            </div>
+    <main class="pp-auth-card">
+        <div class="pp-auth-brand">
+            <span class="pp-auth-logo"><i class="fa-solid fa-lock" aria-hidden="true"></i></span>
+            <span>PrivatePing</span>
         </div>
-    </div>
-    <script type="text/javascript" src="{% static 'js/registration/Login.js' %}"></script>
-    {% endblock %}
+
+        <h1>Welcome back</h1>
+        <p class="pp-auth-sub">Log in to start an end-to-end encrypted chat.</p>
+
+        {% if error %}
+        <div class="pp-auth-alert" id="error-field" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" id="auth-form" data-mode="login" novalidate>
+            {% csrf_token %}
+            <div class="pp-field" id="field-username">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" value="{{ username|default:'' }}" maxlength="20"
+                    autocomplete="username" autocapitalize="none" spellcheck="false" required
+                    {% if not username %}autofocus{% endif %}>
+                <small class="pp-hint" aria-live="polite"></small>
+            </div>
+
+            <div class="pp-field" id="field-password">
+                <label for="password">Password</label>
+                <div class="pp-password">
+                    <input type="password" id="password" name="password" autocomplete="current-password" required
+                        {% if username %}autofocus{% endif %}>
+                    <button type="button" class="pp-reveal" data-target="password" aria-label="Show password">
+                        <i class="fa-regular fa-eye" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <small class="pp-hint" aria-live="polite"></small>
+            </div>
+
+            <button type="submit" class="pp-auth-submit" id="submit-button">Log in</button>
+        </form>
+
+        <div class="pp-auth-divider">or</div>
+        <a class="pp-auth-secondary" href="{% url 'registration:anonymous_direct_login' %}">
+            <i class="fa-solid fa-user-secret" aria-hidden="true"></i> Continue anonymously
+        </a>
+
+        <p class="pp-auth-switch">New to PrivatePing? <a href="{% url 'registration:register' %}">Create an account</a></p>
+    </main>
+
+    {% if fact %}
+    <p class="pp-auth-fact"><i class="fa-regular fa-lightbulb" aria-hidden="true"></i> {{ fact }}</p>
+    {% endif %}
+
+    <script src="{% static 'js/registration/auth.js' %}"></script>
+{% endblock %}

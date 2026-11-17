@@ -1,18 +1,27 @@
 {% extends "chat/Base.html" %}
 {% load static %}
 
-{% block content %}
+{% block head %}
 <link rel="stylesheet" href="{% static 'css/chat/waiting_room.css' %}">
+{% endblock %}
+
+{% block page_data %}{{ friend.username|json_script:"pp-partner" }}{% endblock %}
+
+{% block content %}
 <div class="text-center">
-    <h1 id="waiting_text">Waiting for <u>{{friend}}</u> to connect</h1>
+    <h1 id="waiting_text">Waiting for <u>{{ friend.name }}</u> to join<span id="waiting-dots"></span></h1>
+    <p class="pp-e2ee-note">We'll open the secure chat as soon as {{ friend.name }} opens a chat with you.
+        <br>They'll see a notification that you're waiting.</p>
 </div>
 <div id="loader-position">
     <span class="loader"></span>
     <div>
-        <button class="btn-lg btn-primary back-btn" onclick="goback();"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+        <button type="button" class="btn-lg btn-primary back-btn" data-action="back" aria-label="Go back">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i></button>
     </div>
 </div>
+{% endblock %}
 
-<script type="text/javascript" src="{% static 'js/chat/waiting_room.js' %}"></script>
-
+{% block scripts %}
+<script src="{% static 'js/chat/waiting_room.js' %}"></script>
 {% endblock %}

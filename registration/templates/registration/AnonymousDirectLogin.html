@@ -2,23 +2,49 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/registration/AnonymousDirectLogin.css' %}" />
-<title>PrivatePing - Anonymous Direct Login</title>
+<link rel="stylesheet" href="{% static 'css/registration/auth.css' %}">
+<title>PrivatePing - Continue anonymously</title>
 </head>
 
-<body>
-  <form id="anonymous-direct-login-form">
-    {% csrf_token %}
-    <div id="login-container">
-      <span class="DirectLoginLoader"></span>
-      <h1 class="processing-text" id="processing">Checking Browser...</h1>
-      <small>This temporary account will be deleted once you Logout.</small>
-      <div class="captcha-container">
-        {{ form.hcaptcha }}
-      </div>
-      <input name="action" type="hidden" value="create" />
-    </div>
-  </form>
+<body class="pp-auth" data-title="PrivatePing - Continue anonymously">
+    {{ pow|json_script:"pp-pow" }}
+    <a class="pp-auth-back" href="{% url 'registration:home' %}"><i class="fa-solid fa-arrow-left"></i> Back</a>
 
-  <script type="text/javascript" src="{% static 'js/registration/AnonymousDirectLogin.js' %}"></script>
-  {% endblock %}
+    <main class="pp-auth-card">
+        <div class="pp-auth-brand">
+            <span class="pp-auth-logo"><i class="fa-solid fa-user-secret" aria-hidden="true"></i></span>
+            <span>PrivatePing</span>
+        </div>
+
+        <h1>Continue anonymously</h1>
+        <p class="pp-auth-sub">Get a temporary account instantly. No username, password or email.</p>
+
+        <ul class="pp-anon-facts">
+            <li><i class="fa-solid fa-shuffle" aria-hidden="true"></i> You get a random username to share with a friend</li>
+            <li><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Deleted when you log out, or after 24 hours</li>
+            <li><i class="fa-solid fa-lock" aria-hidden="true"></i> Same end-to-end encryption as regular accounts</li>
+        </ul>
+
+        <div class="pp-auth-alert" id="anon-error" role="alert" hidden></div>
+
+        <form id="anonymous-direct-login-form" method="post" novalidate>
+            {% csrf_token %}
+            {# Honeypot: hidden from people, naive bots fill it in #}
+            <div class="pp-hp" aria-hidden="true">
+                <label for="website">Website</label>
+                <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+            </div>
+            <button type="submit" class="pp-auth-submit" id="submit-button">Start chatting anonymously</button>
+        </form>
+
+        <div class="pp-pow" id="pow-status" aria-live="polite">
+            <div class="pp-pow-bar"><span id="pow-bar"></span></div>
+            <small id="pow-text"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                Checking you're not a bot, on your device. No puzzles, nothing tracked.</small>
+        </div>
+
+        <p class="pp-auth-switch">Want to keep your username? <a href="{% url 'registration:register' %}">Create an account</a></p>
+    </main>
+
+    <script src="{% static 'js/registration/AnonymousDirectLogin.js' %}"></script>
+{% endblock %}

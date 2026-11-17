@@ -1,0 +1,10 @@
+{% if messages %}
+<div class="pp-flash-stack" role="status" aria-live="polite">
+    {% for message in messages %}
+    <div class="pp-flash pp-flash-{{ message.tags|default:'info' }}">
+        <span>{{ message }}</span>
+        <button type="button" class="pp-flash-close" aria-label="Dismiss">&times;</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

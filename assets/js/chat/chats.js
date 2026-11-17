@@ -1,82 +1,52 @@
-const socketProtocol_3 = (window.location.protocol === 'https:') ? 'wss' : 'ws';
+(function () {
+  "use strict";
 
-const socket_3 = new WebSocket(socketProtocol_3 + "://" + window.location.host + '/ws/chat/status/');
-socket_3.onopen = function (e) {
-    socket_3.send(JSON.stringify({
-        'check': 'livestatus',
-        'for': getUserName(),
-    }));
-};
+  const partner = getUserName();
+  const partnerName = PP.readJSON("pp-partner-name", partner);
+  const presence = document.getElementById("partner-presence");
+  const presenceText = presence && presence.querySelector(".pp-presence-text");
+  const awayBanner = document.getElementById("away-banner");
+  const socket = new WebSocket(PP.wsUrl("/ws/chat/status/"));
+  let misses = 0;
+  let here = false;
+  let typing = false;
 
-//keep checking if user is online
-setInterval(function () {
-    socket_3.send(JSON.stringify({
-        'check': 'livestatus',
-        'for': getUserName(),
-    }));
-}, 3000);
+  function render() {
+    if (!presence) return;
+    let state = "unknown", text = "Waiting for " + partnerName + "…";
+    if (typing) { state = "typing"; text = "typing…"; }
+    else if (here) { state = "here"; text = "In this chat"; }
+    else if (misses >= 2) { state = "away"; text = "Away"; }
+    presence.dataset.state = state;
+    presenceText.textContent = text;
+    if (awayBanner) awayBanner.hidden = !(misses >= 4 && !here);
+  }
 
-var count = 0;
-socket_3.addEventListener('message', function (e) {
-    const data = JSON.parse(e.data);
-    if (data.status == 'offline') {
-        if (count >= 3) {
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                confirmButtonColor: "#003d89",
-                text: "User disconnected, Navigating you to home page!",
-              }).then(function(){
-                parent.location.href = "/";
+  function check() {
+    if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ check: "livestatus", for: partner }));
+  }
 
-              });
-        }
-        else {
-            count++;
-        }
+  socket.addEventListener("open", check);
+  setInterval(check, 3000);
+
+  socket.addEventListener("message", function (e) {
+    let data;
+    try { data = JSON.parse(e.data); } catch (err) { return; }
+    if (data.status === "offline") {
+      misses++;
+      if (misses >= 2) here = false;
+    } else {
+      misses = 0;
+      here = true;
     }
-    else {
-        count = 0;
-    }
-});
-
-//Do not send empty messages
-if(document.getElementById("msg_field").value == ""){
-    document.getElementById("send_btn").disabled = true;
-}
-else{
-    document.getElementById("send_btn").disabled = false;
-}
-
-document.getElementById("msg_field").addEventListener("input", function(){
-    if(document.getElementById("msg_field").value == ""){
-        document.getElementById("send_btn").disabled = true;
-    }
-    else{
-        document.getElementById("send_btn").disabled = false;
-    }
-});
-
-Swal.fire({
-    title: "Creating a secure room!",
-    text: "Please wait while we connect you.",
-    confirmButtonColor: "#003d89",
-    icon: "info"
+    render();
   });
-document.getElementById("msg_field").disabled = true;
-document.getElementById("send_btn").disabled = true;
 
-function trashmessages(){
-    //play sound
-    var audio = new Audio('/static/media/delete.mp3');
-    audio.play();
+  document.addEventListener("pp:typing", function (e) {
+    typing = !!e.detail;
+    if (typing) { here = true; misses = 0; }
+    render();
+  });
 
-    //Remove all messages whose id is ChatMessage
-    var chatMessages = document.querySelectorAll('#ChatMessage');
-
-    // Iterate through each element and remove it
-    chatMessages.forEach(function(element) {
-        element.remove();
-    });
-
-}
+  render();
+})();
